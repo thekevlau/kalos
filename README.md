@@ -1,6 +1,6 @@
 # Project Kalos
 
-Kalos is an IOT based form analysis and correction tool that will help you reach your fitness goals faster and safer.
+Kalos is an IOT form analysis and correction tool that will help you reach your fitness goals faster and safer.
 
 
 
