@@ -1,0 +1,407 @@
+<html>
+<head>
+	<title>org.apache.cordova.inappbrowser</title>
+</head>
+<body>
+<!---
+    Licensed to the Apache Software Foundation (ASF) under one
+    or more contributor license agreements.  See the NOTICE file
+    distributed with this work for additional information
+    regarding copyright ownership.  The ASF licenses this file
+    to you under the Apache License, Version 2.0 (the
+    "License"); you may not use this file except in compliance
+    with the License.  You may obtain a copy of the License at
+
+      http://www.apache.org/licenses/LICENSE-2.0
+
+    Unless required by applicable law or agreed to in writing,
+    software distributed under the License is distributed on an
+    "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+    KIND, either express or implied.  See the License for the
+    specific language governing permissions and limitations
+    under the License.
+-->
+
+<h1>org.apache.cordova.inappbrowser</h1>
+
+<p>This plugin provides a web browser view that displays when calling <code>window.open()</code>.</p>
+
+<pre><code>var ref = window.open(&#39;http://apache.org&#39;, &#39;_blank&#39;, &#39;location=yes&#39;);
+</code></pre>
+
+<p>The InAppBrowser window behaves like a standard web browser,
+and can&#39;t access Cordova APIs. For this reason, the InAppBrowser is recommended
+if you need to load third-party (untrusted) content, instead of loading that
+into the main Cordova webview. The InAppBrowser is not subject to the
+whitelist, nor is opening links in the system browser.</p>
+
+<p>The InAppBrowser provides by default its own GUI controls for the user (back,
+forward, done).</p>
+
+<p>This plugin hooks <code>window.open</code>.</p>
+
+<p>Although <code>window.open</code> is in the global scope, InAppBrowser is not available until after the <code>deviceready</code> event.</p>
+
+<pre><code>document.addEventListener(&quot;deviceready&quot;, onDeviceReady, false);
+function onDeviceReady() {
+    console.log(&quot;window.open works well&quot;);
+}
+</code></pre>
+
+<h2>Installation</h2>
+
+<pre><code>cordova plugin add org.apache.cordova.inappbrowser
+</code></pre>
+
+<h2>window.open</h2>
+
+<p>Opens a URL in a new <code>InAppBrowser</code> instance, the current browser
+instance, or the system browser.</p>
+
+<pre><code>var ref = window.open(url, target, options);
+</code></pre>
+
+<ul>
+<li><p><strong>ref</strong>: Reference to the <code>InAppBrowser</code> window. <u>(InAppBrowser)</u></p></li>
+<li><p><strong>url</strong>: The URL to load <u>(String)</u>. Call <code>encodeURI()</code> on this if the URL contains Unicode characters.</p></li>
+<li><p><strong>target</strong>: The target in which to load the URL, an optional parameter that defaults to <code>_self</code>. <u>(String)</u></p>
+
+<ul>
+<li><code>_self</code>: Opens in the Cordova WebView if the URL is in the white list, otherwise it opens in the <code>InAppBrowser</code>.</li>
+<li><code>_blank</code>: Opens in the <code>InAppBrowser</code>.</li>
+<li><code>_system</code>: Opens in the system&#39;s web browser.</li>
+</ul></li>
+<li><p><strong>options</strong>: Options for the <code>InAppBrowser</code>. Optional, defaulting to: <code>location=yes</code>. <u>(String)</u></p>
+
+<p>The <code>options</code> string must not contain any blank space, and each feature&#39;s name/value pairs must be separated by a comma. Feature names are case insensitive. All platforms support the value below:</p>
+
+<ul>
+<li><strong>location</strong>: Set to <code>yes</code> or <code>no</code> to turn the <code>InAppBrowser</code>&#39;s location bar on or off.</li>
+</ul>
+
+<p>Android only:</p>
+
+<ul>
+<li><strong>hidden</strong>: set to <code>yes</code> to create the browser and load the page, but not show it. The loadstop event fires when loading is complete. Omit or set to <code>no</code> (default) to have the browser open and load normally.</li>
+<li><strong>clearcache</strong>: set to <code>yes</code> to have the browser&#39;s cookie cache cleared before the new window is opened</li>
+<li><strong>clearsessioncache</strong>: set to <code>yes</code> to have the session cookie cache cleared before the new window is opened</li>
+</ul>
+
+<p>iOS only:</p>
+
+<ul>
+<li><strong>closebuttoncaption</strong>: set to a string to use as the <strong>Done</strong> button&#39;s caption. Note that you need to localize this value yourself.</li>
+<li><strong>disallowoverscroll</strong>: Set to <code>yes</code> or <code>no</code> (default is <code>no</code>). Turns on/off the UIWebViewBounce property.</li>
+<li><strong>hidden</strong>: set to <code>yes</code> to create the browser and load the page, but not show it. The loadstop event fires when loading is complete. Omit or set to <code>no</code> (default) to have the browser open and load normally.</li>
+<li><strong>clearcache</strong>: set to <code>yes</code> to have the browser&#39;s cookie cache cleared before the new window is opened</li>
+<li><strong>clearsessioncache</strong>: set to <code>yes</code> to have the session cookie cache cleared before the new window is opened</li>
+<li><strong>toolbar</strong>:  set to <code>yes</code> or <code>no</code> to turn the toolbar on or off for the InAppBrowser (defaults to <code>yes</code>)</li>
+<li><strong>enableViewportScale</strong>:  Set to <code>yes</code> or <code>no</code> to prevent viewport scaling through a meta tag (defaults to <code>no</code>).</li>
+<li><strong>mediaPlaybackRequiresUserAction</strong>: Set to <code>yes</code> or <code>no</code> to prevent HTML5 audio or video from autoplaying (defaults to <code>no</code>).</li>
+<li><strong>allowInlineMediaPlayback</strong>: Set to <code>yes</code> or <code>no</code> to allow in-line HTML5 media playback, displaying within the browser window rather than a device-specific playback interface. The HTML&#39;s <code>video</code> element must also include the <code>webkit-playsinline</code> attribute (defaults to <code>no</code>)</li>
+<li><strong>keyboardDisplayRequiresUserAction</strong>: Set to <code>yes</code> or <code>no</code> to open the keyboard when form elements receive focus via JavaScript&#39;s <code>focus()</code> call (defaults to <code>yes</code>).</li>
+<li><strong>suppressesIncrementalRendering</strong>: Set to <code>yes</code> or <code>no</code> to wait until all new view content is received before being rendered (defaults to <code>no</code>).</li>
+<li><strong>presentationstyle</strong>:  Set to <code>pagesheet</code>, <code>formsheet</code> or <code>fullscreen</code> to set the <a href="http://developer.apple.com/library/ios/documentation/UIKit/Reference/UIViewController_Class/Reference/Reference.html#//apple_ref/occ/instp/UIViewController/modalPresentationStyle">presentation style</a> (defaults to <code>fullscreen</code>).</li>
+<li><strong>transitionstyle</strong>: Set to <code>fliphorizontal</code>, <code>crossdissolve</code> or <code>coververtical</code> to set the <a href="http://developer.apple.com/library/ios/#documentation/UIKit/Reference/UIViewController_Class/Reference/Reference.html#//apple_ref/occ/instp/UIViewController/modalTransitionStyle">transition style</a> (defaults to <code>coververtical</code>).</li>
+<li><strong>toolbarposition</strong>: Set to <code>top</code> or <code>bottom</code> (default is <code>bottom</code>). Causes the toolbar to be at the top or bottom of the window.</li>
+</ul>
+
+<p>Windows only:</p>
+
+<ul>
+<li><strong>hidden</strong>: set to <code>yes</code> to create the browser and load the page, but not show it. The loadstop event fires when loading is complete. Omit or set to <code>no</code> (default) to have the browser open and load normally.</li>
+</ul></li>
+</ul>
+
+<h3>Supported Platforms</h3>
+
+<ul>
+<li>Amazon Fire OS</li>
+<li>Android</li>
+<li>BlackBerry 10</li>
+<li>Firefox OS</li>
+<li>iOS</li>
+<li>Windows 8 and 8.1</li>
+<li>Windows Phone 7 and 8</li>
+</ul>
+
+<h3>Example</h3>
+
+<pre><code>var ref = window.open(&#39;http://apache.org&#39;, &#39;_blank&#39;, &#39;location=yes&#39;);
+var ref2 = window.open(encodeURI(&#39;http://ja.m.wikipedia.org/wiki/ハングル&#39;), &#39;_blank&#39;, &#39;location=yes&#39;);
+</code></pre>
+
+<h3>Firefox OS Quirks</h3>
+
+<p>As plugin doesn&#39;t enforce any design there is a need to add some CSS rules if
+opened with <code>target=&#39;_blank&#39;</code>. The rules might look like these</p>
+
+<pre><code class="css">.inAppBrowserWrap {
+  background-color: rgba(0,0,0,0.75);
+  color: rgba(235,235,235,1.0);
+}
+.inAppBrowserWrap menu {
+  overflow: auto;
+  list-style-type: none;
+  padding-left: 0;
+}
+.inAppBrowserWrap menu li {
+  font-size: 25px;
+  height: 25px;
+  float: left;
+  margin: 0 10px;
+  padding: 3px 10px;
+  text-decoration: none;
+  color: #ccc;
+  display: block;
+  background: rgba(30,30,30,0.50);
+}
+.inAppBrowserWrap menu li.disabled {
+    color: #777;
+}
+</code></pre>
+
+<h2>InAppBrowser</h2>
+
+<p>The object returned from a call to <code>window.open</code>.</p>
+
+<h3>Methods</h3>
+
+<ul>
+<li>addEventListener</li>
+<li>removeEventListener</li>
+<li>close</li>
+<li>show</li>
+<li>executeScript</li>
+<li>insertCSS</li>
+</ul>
+
+<h2>addEventListener</h2>
+
+<blockquote>
+<p>Adds a listener for an event from the <code>InAppBrowser</code>.</p>
+</blockquote>
+
+<pre><code>ref.addEventListener(eventname, callback);
+</code></pre>
+
+<ul>
+<li><p><strong>ref</strong>: reference to the <code>InAppBrowser</code> window <u>(InAppBrowser)</u></p></li>
+<li><p><strong>eventname</strong>: the event to listen for <u>(String)</u></p>
+
+<ul>
+<li><strong>loadstart</strong>: event fires when the <code>InAppBrowser</code> starts to load a URL.</li>
+<li><strong>loadstop</strong>: event fires when the <code>InAppBrowser</code> finishes loading a URL.</li>
+<li><strong>loaderror</strong>: event fires when the <code>InAppBrowser</code> encounters an error when loading a URL.</li>
+<li><strong>exit</strong>: event fires when the <code>InAppBrowser</code> window is closed.</li>
+</ul></li>
+<li><p><strong>callback</strong>: the function that executes when the event fires. The function is passed an <code>InAppBrowserEvent</code> object as a parameter.</p></li>
+</ul>
+
+<h3>InAppBrowserEvent Properties</h3>
+
+<ul>
+<li><p><strong>type</strong>: the eventname, either <code>loadstart</code>, <code>loadstop</code>, <code>loaderror</code>, or <code>exit</code>. <u>(String)</u></p></li>
+<li><p><strong>url</strong>: the URL that was loaded. <u>(String)</u></p></li>
+<li><p><strong>code</strong>: the error code, only in the case of <code>loaderror</code>. <u>(Number)</u></p></li>
+<li><p><strong>message</strong>: the error message, only in the case of <code>loaderror</code>. <u>(String)</u></p></li>
+</ul>
+
+<h3>Supported Platforms</h3>
+
+<ul>
+<li>Amazon Fire OS</li>
+<li>Android</li>
+<li>iOS</li>
+<li>Windows 8 and 8.1</li>
+<li>Windows Phone 7 and 8</li>
+</ul>
+
+<h3>Quick Example</h3>
+
+<pre><code>var ref = window.open(&#39;http://apache.org&#39;, &#39;_blank&#39;, &#39;location=yes&#39;);
+ref.addEventListener(&#39;loadstart&#39;, function(event) { alert(event.url); });
+</code></pre>
+
+<h2>removeEventListener</h2>
+
+<blockquote>
+<p>Removes a listener for an event from the <code>InAppBrowser</code>.</p>
+</blockquote>
+
+<pre><code>ref.removeEventListener(eventname, callback);
+</code></pre>
+
+<ul>
+<li><p><strong>ref</strong>: reference to the <code>InAppBrowser</code> window. <u>(InAppBrowser)</u></p></li>
+<li><p><strong>eventname</strong>: the event to stop listening for. <u>(String)</u></p>
+
+<ul>
+<li><strong>loadstart</strong>: event fires when the <code>InAppBrowser</code> starts to load a URL.</li>
+<li><strong>loadstop</strong>: event fires when the <code>InAppBrowser</code> finishes loading a URL.</li>
+<li><strong>loaderror</strong>: event fires when the <code>InAppBrowser</code> encounters an error loading a URL.</li>
+<li><strong>exit</strong>: event fires when the <code>InAppBrowser</code> window is closed.</li>
+</ul></li>
+<li><p><strong>callback</strong>: the function to execute when the event fires.
+The function is passed an <code>InAppBrowserEvent</code> object.</p></li>
+</ul>
+
+<h3>Supported Platforms</h3>
+
+<ul>
+<li>Amazon Fire OS</li>
+<li>Android</li>
+<li>iOS</li>
+<li>Windows 8 and 8.1</li>
+<li>Windows Phone 7 and 8</li>
+</ul>
+
+<h3>Quick Example</h3>
+
+<pre><code>var ref = window.open(&#39;http://apache.org&#39;, &#39;_blank&#39;, &#39;location=yes&#39;);
+var myCallback = function(event) { alert(event.url); }
+ref.addEventListener(&#39;loadstart&#39;, myCallback);
+ref.removeEventListener(&#39;loadstart&#39;, myCallback);
+</code></pre>
+
+<h2>close</h2>
+
+<blockquote>
+<p>Closes the <code>InAppBrowser</code> window.</p>
+</blockquote>
+
+<pre><code>ref.close();
+</code></pre>
+
+<ul>
+<li><strong>ref</strong>: reference to the <code>InAppBrowser</code> window <u>(InAppBrowser)</u></li>
+</ul>
+
+<h3>Supported Platforms</h3>
+
+<ul>
+<li>Amazon Fire OS</li>
+<li>Android</li>
+<li>Firefox OS</li>
+<li>iOS</li>
+<li>Windows 8 and 8.1</li>
+<li>Windows Phone 7 and 8</li>
+</ul>
+
+<h3>Quick Example</h3>
+
+<pre><code>var ref = window.open(&#39;http://apache.org&#39;, &#39;_blank&#39;, &#39;location=yes&#39;);
+ref.close();
+</code></pre>
+
+<h2>show</h2>
+
+<blockquote>
+<p>Displays an InAppBrowser window that was opened hidden. Calling this has no effect if the InAppBrowser was already visible.</p>
+</blockquote>
+
+<pre><code>ref.show();
+</code></pre>
+
+<ul>
+<li><strong>ref</strong>: reference to the InAppBrowser window (<code>InAppBrowser</code>)</li>
+</ul>
+
+<h3>Supported Platforms</h3>
+
+<ul>
+<li>Amazon Fire OS</li>
+<li>Android</li>
+<li>iOS</li>
+<li>Windows 8 and 8.1</li>
+</ul>
+
+<h3>Quick Example</h3>
+
+<pre><code>var ref = window.open(&#39;http://apache.org&#39;, &#39;_blank&#39;, &#39;hidden=yes&#39;);
+// some time later...
+ref.show();
+</code></pre>
+
+<h2>executeScript</h2>
+
+<blockquote>
+<p>Injects JavaScript code into the <code>InAppBrowser</code> window</p>
+</blockquote>
+
+<pre><code>ref.executeScript(details, callback);
+</code></pre>
+
+<ul>
+<li><p><strong>ref</strong>: reference to the <code>InAppBrowser</code> window. <u>(InAppBrowser)</u></p></li>
+<li><p><strong>injectDetails</strong>: details of the script to run, specifying either a <code>file</code> or <code>code</code> key. <u>(Object)</u></p>
+
+<ul>
+<li><strong>file</strong>: URL of the script to inject.</li>
+<li><strong>code</strong>: Text of the script to inject.</li>
+</ul></li>
+<li><p><strong>callback</strong>: the function that executes after the JavaScript code is injected.</p>
+
+<ul>
+<li>If the injected script is of type <code>code</code>, the callback executes
+with a single parameter, which is the return value of the
+script, wrapped in an <code>Array</code>. For multi-line scripts, this is
+the return value of the last statement, or the last expression
+evaluated.</li>
+</ul></li>
+</ul>
+
+<h3>Supported Platforms</h3>
+
+<ul>
+<li>Amazon Fire OS</li>
+<li>Android</li>
+<li>iOS</li>
+<li>Windows 8 and 8.1</li>
+</ul>
+
+<h3>Quick Example</h3>
+
+<pre><code>var ref = window.open(&#39;http://apache.org&#39;, &#39;_blank&#39;, &#39;location=yes&#39;);
+ref.addEventListener(&#39;loadstop&#39;, function() {
+    ref.executeScript({file: &quot;myscript.js&quot;});
+});
+</code></pre>
+
+<h2>insertCSS</h2>
+
+<blockquote>
+<p>Injects CSS into the <code>InAppBrowser</code> window.</p>
+</blockquote>
+
+<pre><code>ref.insertCSS(details, callback);
+</code></pre>
+
+<ul>
+<li><p><strong>ref</strong>: reference to the <code>InAppBrowser</code> window <u>(InAppBrowser)</u></p></li>
+<li><p><strong>injectDetails</strong>: details of the script to run, specifying either a <code>file</code> or <code>code</code> key. <u>(Object)</u></p>
+
+<ul>
+<li><strong>file</strong>: URL of the stylesheet to inject.</li>
+<li><strong>code</strong>: Text of the stylesheet to inject.</li>
+</ul></li>
+<li><p><strong>callback</strong>: the function that executes after the CSS is injected.</p></li>
+</ul>
+
+<h3>Supported Platforms</h3>
+
+<ul>
+<li>Amazon Fire OS</li>
+<li>Android</li>
+<li>iOS</li>
+</ul>
+
+<h3>Quick Example</h3>
+
+<pre><code>var ref = window.open(&#39;http://apache.org&#39;, &#39;_blank&#39;, &#39;location=yes&#39;);
+ref.addEventListener(&#39;loadstop&#39;, function() {
+    ref.insertCSS({file: &quot;mystyles.css&quot;});
+});
+</code></pre>
+</body>
+</html>

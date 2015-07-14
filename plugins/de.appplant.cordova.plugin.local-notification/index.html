@@ -1,0 +1,566 @@
+<html>
+<head>
+	<title>de.appplant.cordova.plugin.local-notification</title>
+</head>
+<body>
+<h1>Cordova Local-Notification Plugin</h1>
+
+<p>The essential purpose of local notifications is to enable an application to inform its users that it has something for them — for example, a message or an upcoming appointment — when the application isn’t running in the foreground.<br>
+They are scheduled by an application and delivered on the same device.</p>
+
+<h3>How they appear to the user</h3>
+
+<p>Users see notifications in the following ways:</p>
+
+<ul>
+<li>Displaying an alert or banner</li>
+<li>Badging the app’s icon</li>
+<li>Playing a sound</li>
+</ul>
+
+<h3>Examples of Notification Usage</h3>
+
+<p>Local notifications are ideally suited for applications with time-based behaviors, such as calendar and to-do list applications. Applications that run in the background for the limited period allowed by iOS might also find local notifications useful.<br>
+For example, applications that depend on servers for messages or data can poll their servers for incoming items while running in the background; if a message is ready to view or an update is ready to download, they can then present a local notification immediately to inform their users.</p>
+
+<h3>Plugin&#39;s Purpose</h3>
+
+<p>The purpose of the plugin is to create an platform independent javascript interface for <a href="https://cordova.apache.org">Cordova</a> based mobile applications to access the specific API on each platform.</p>
+
+<h2>Supported Platforms</h2>
+
+<ul>
+<li><p><strong>iOS</strong> <em>(including iOS8)</em><br>
+See <a href="http://developer.apple.com/library/ios/documentation/NetworkingInternet/Conceptual/RemoteNotificationsPG/Chapters/WhatAreRemoteNotif.html">Local and Push Notification Programming Guide</a> for detailed informations and screenshots.</p></li>
+<li><p><strong>Android</strong> <em>(SDK &gt;=11)</em><br>
+See <a href="http://developer.android.com/guide/topics/ui/notifiers/notifications.html">Notification Guide</a> for detailed informations and screenshots.</p></li>
+<li><p><strong>WP8</strong><br>
+See <a href="http://msdn.microsoft.com/en-us/library/windowsphone/develop/jj207047.aspx">Local notifications for Windows Phone</a> for detailed informations and screenshots.
+<br><em>Windows Phone 8.0 has no notification center. Instead local notifications are realized through live tiles updates.</em></p></li>
+</ul>
+
+<h2>Dependencies</h2>
+
+<p><a href="https://cordova.apache.org">Cordova</a> will check all dependencies and install them if they are missing.</p>
+
+<ul>
+<li><a href="https://github.com/apache/cordova-plugin-device">org.apache.cordova.device</a> <em>(since v0.6.0)</em></li>
+</ul>
+
+<h1>Installation</h1>
+
+<p>The plugin can either be installed into the local development environment or cloud based through <a href="http://docs.build.phonegap.com/en_US/3.3.0/index.html">PhoneGap Build</a>.</p>
+
+<h3>Adding the Plugin to your project</h3>
+
+<p>Through the <a href="http://cordova.apache.org/docs/en/3.0.0/guide_cli_index.md.html#The%20Command-line%20Interface">Command-line Interface</a>:</p>
+
+<pre><code class="bash"># ~~ from master ~~
+cordova plugin add https://github.com/katzer/cordova-plugin-local-notifications.git
+</code></pre>
+
+<p>or to use the last stable version:</p>
+
+<pre><code class="bash"># ~~ stable version ~~
+cordova plugin add de.appplant.cordova.plugin.local-notification@0.7.6
+</code></pre>
+
+<h3>Removing the Plugin from your project</h3>
+
+<p>Through the <a href="http://cordova.apache.org/docs/en/3.0.0/guide_cli_index.md.html#The%20Command-line%20Interface">Command-line Interface</a>:</p>
+
+<pre><code class="bash">cordova plugin rm de.appplant.cordova.plugin.local-notification
+</code></pre>
+
+<h3>PhoneGap Build</h3>
+
+<p>Add the following xml to your config.xml to always use the latest version of this plugin:</p>
+
+<pre><code class="xml">&lt;gap:plugin name=&quot;de.appplant.cordova.plugin.local-notification&quot; /&gt;
+</code></pre>
+
+<p>or to use an specific version:</p>
+
+<pre><code class="xml">&lt;gap:plugin name=&quot;de.appplant.cordova.plugin.local-notification&quot; version=&quot;0.7.6&quot; /&gt;
+</code></pre>
+
+<p>More informations can be found <a href="https://build.phonegap.com/plugins/1196">here</a>.</p>
+
+<h2>ChangeLog</h2>
+
+<h4>Version 0.7.6 (03.10.2014)</h4>
+
+<ul>
+<li>[bugfix:] <code>hasPermission</code> and <code>promptForPermission</code> let the app crash on iOS7 and older.</li>
+<li>[bugfix:] Convert the id value to a String before comparison.</li>
+<li>[bugfix:] Prevent possible crash when calling <code>cancelAll</code>.</li>
+<li>[enhancement:] Do not inherit any notification defaults.</li>
+</ul>
+
+<h4>Version 0.7.5 (29.09.2014)</h4>
+
+<ul>
+<li>[enhancement:] <strong>iOS8 Support</strong></li>
+<li>[feature:] New method <code>hasPermission</code> to ask if the user has granted to display local notifications.</li>
+<li>[feature:] New method <code>promptForPermission</code> to promt the user to grant permission to display local notifications.</li>
+</ul>
+
+<h4>Further informations</h4>
+
+<ul>
+<li>See <a href="CHANGELOG.md">CHANGELOG.md</a> to get the full changelog for the plugin.</li>
+</ul>
+
+<h2>Using the plugin</h2>
+
+<p>The plugin creates the object <code>window.plugin.notification.local</code> with the following methods:</p>
+
+<h3>Plugin initialization</h3>
+
+<p>The plugin and its methods are not available before the <em>deviceready</em> event has been fired.</p>
+
+<pre><code class="javascript">document.addEventListener(&#39;deviceready&#39;, function () {
+    // window.plugin.notification.local is now available
+}, false);
+</code></pre>
+
+<h3>Determine if the app does have the permission to show local notifications</h3>
+
+<p>If the permission has been granted through the user can be retrieved through the <code>notification.local.hasPermission</code> interface.<br/>
+The method takes a callback function as its argument which will be called with a boolean value. Optional the scope of the callback function ca be defined through a second argument.</p>
+
+<h4>Further informations</h4>
+
+<ul>
+<li>The method is supported on each platform, however its only relevant for iOS8 and above.</li>
+</ul>
+
+<pre><code class="javascript">window.plugin.notification.local.hasPermission(function (granted) {
+    // console.log(&#39;Permission has been granted: &#39; + granted);
+});
+</code></pre>
+
+<h3>Prompt the user to grant permission for local notifications</h3>
+
+<p>The user can be prompted to grant the required permission through the <code>notification.local.promptForPermission</code> interface.</p>
+
+<h4>Further informations</h4>
+
+<ul>
+<li>The method is supported on each platform, however its only relevant for iOS8 and above.</li>
+<li>The user will only get a prompt dialog for the first time. Later its only possible to change the setting via the notification center.</li>
+</ul>
+
+<pre><code class="javascript">window.plugin.notification.local.promptForPermission();
+</code></pre>
+
+<h3>Schedule local notifications</h3>
+
+<p>Local notifications can be scheduled through the <code>notification.local.add</code> interface.<br>
+The method takes a hash as an argument to specify the notification&#39;s properties and returns the ID for the notification.<br>
+Scheduling a local notification will override the previously one with the same ID.
+All properties are optional. If no date object is given, the notification pops-up immediately.</p>
+
+<p><strong>Note:</strong> On Android the notification id needs to be a string which can be converted to a number.
+If the ID has an invalid format, it will be ignored, but canceling the notification will fail.</p>
+
+<h4>Further informations</h4>
+
+<ul>
+<li>The notification can only be scheduled if the user has previously granted the <a href="#prompt-the-user-to-grant-permission-for-local-notifications">required permission</a>.</li>
+<li>See the <a href="#get-notified-when-a-local-notification-has-been-scheduled">onadd</a> event of how a listener can be registered to be notified when a local notification has been scheduled.</li>
+<li>See the <a href="#get-notified-when-a-local-notification-has-been-triggered">ontrigger</a> event of how a listener can be registered to be notified when a local notification has been triggered.</li>
+<li>See the <a href="#get-notified-when-the-user-has-been-clicked-on-a-local-notification">onclick</a> event of how a listener can be registered to be notified when the user has been clicked on a local notification.</li>
+<li>See the [platform specific properties][platform_specific_properties] of which other properties are available too.</li>
+<li>See <a href="#get-the-default-values-of-the-local-notification-properties">getDefaults</a> of which property values are used by default and <a href="#set-the-default-values-of-the-local-notification-properties">setDefaults</a> of how to override them.</li>
+<li>See the <a href="#examples">examples</a> of how to schedule local notifications.</li>
+</ul>
+
+<pre><code class="javascript">window.plugin.notification.local.add({
+    id:         String,  // A unique id of the notifiction
+    date:       Date,    // This expects a date object
+    message:    String,  // The message that is displayed
+    title:      String,  // The title of the message
+    repeat:     String,  // Either &#39;secondly&#39;, &#39;minutely&#39;, &#39;hourly&#39;, &#39;daily&#39;, &#39;weekly&#39;, &#39;monthly&#39; or &#39;yearly&#39;
+    badge:      Number,  // Displays number badge to notification
+    sound:      String,  // A sound to be played
+    json:       String,  // Data to be passed through the notification
+    autoCancel: Boolean, // Setting this flag and the notification is automatically canceled when the user clicks it
+    ongoing:    Boolean, // Prevent clearing of notification (Android only)
+});
+</code></pre>
+
+<h3>Cancel scheduled local notifications</h3>
+
+<p>Local notifications can be canceled through the <code>notification.local.cancel</code> interface.<br>
+Note that only local notifications with an ID can be canceled.</p>
+
+<h4>Further informations</h4>
+
+<ul>
+<li>See the <a href="#get-notified-when-a-local-notification-has-been-canceled">oncancel</a> event of how a listener can be registered to be notified when a local notification has been canceled.</li>
+<li>See <a href="#retrieve-the-ids-from-all-currently-scheduled-local-notifications">getScheduledIds</a> of how to retrieve a list of IDs of all scheduled local notifications.</li>
+</ul>
+
+<pre><code class="javascript">window.plugin.notification.local.cancel(ID);
+</code></pre>
+
+<h3>Cancel all scheduled local notifications</h3>
+
+<p>All local notifications can be canceled through the <code>notification.local.cancelAll</code> interface.<br>
+The method cancels all local notifications even if they have no ID.</p>
+
+<h4>Further informations</h4>
+
+<ul>
+<li>See the <a href="#get-notified-when-a-local-notification-has-been-canceled">oncancel</a> event of how a listener can be registered to be notified when a local notification has been canceled.</li>
+</ul>
+
+<pre><code class="javascript">window.plugin.notification.local.cancelAll();
+</code></pre>
+
+<h3>Check wether a notification with an ID is scheduled</h3>
+
+<p>To check if a notification with an ID is scheduled, the <code>notification.local.isScheduled</code> interface can be used.<br>
+The method takes the ID of the local notification as an argument and a callback function to be called with the result.</p>
+
+<h4>Further informations</h4>
+
+<ul>
+<li>See <a href="#retrieve-the-ids-from-all-currently-scheduled-local-notifications">getScheduledIds</a> of how to retrieve a list of IDs of all scheduled local notifications.</li>
+</ul>
+
+<pre><code class="javascript">window.plugin.notification.local.isScheduled(id, function (isScheduled) {
+    // console.log(&#39;Notification with ID &#39; + id + &#39; is scheduled: &#39; + isScheduled);
+});
+</code></pre>
+
+<h3>Retrieve the IDs from all currently scheduled local notifications</h3>
+
+<p>To retrieve the IDs from all currently scheduled local notifications, the <code>notification.local.isScheduled</code> interface can be used.<br>
+The method takes a callback function to be called with the result as an array of IDs.</p>
+
+<pre><code class="javascript">window.plugin.notification.local.getScheduledIds( function (scheduledIds) {
+    // alert(&#39;Scheduled IDs: &#39; + scheduledIds.join(&#39; ,&#39;));
+});
+</code></pre>
+
+<h3>Get the default values of the local notification properties</h3>
+
+<p>The default values of the local notification properties can be retrieved through the <code>notification.local.getDefaults</code> interface.<br>
+The method returns an object of values for all available local notification properties on the platform.</p>
+
+<h4>Further informations</h4>
+
+<ul>
+<li>See <a href="#set-the-default-values-of-the-local-notification-properties">setDefaults</a> of how to override the default values.</li>
+</ul>
+
+<pre><code class="javascript">window.plugin.notification.local.getDefaults(); // =&gt; Object
+</code></pre>
+
+<h3>Set the default values of the local notification properties</h3>
+
+<p>The default values of the local notification properties can be set through the <code>notification.local.setDefaults</code> interface.<br>
+The method takes an object as argument.</p>
+
+<h4>Further informations</h4>
+
+<ul>
+<li>See the <a href="#schedule-local-notifications">add</a> interface and the [platform specific properties][platform_specific_properties] to get an overview about all available local notification properties.</li>
+<li>See the [example][setdefaults_example] of how to override default values.</li>
+</ul>
+
+<pre><code class="javascript">window.plugin.notification.local.setDefaults(Object);
+</code></pre>
+
+<h3>Get notified when a local notification has been scheduled</h3>
+
+<p>The <code>notification.local.onadd</code> interface can be used to get notified when a local notification has been scheduled.</p>
+
+<p>The listener has to be a function and takes the following arguments:</p>
+
+<ul>
+<li>id: The ID of the notification</li>
+<li>state: Either <em>background</em> or <em>foreground</em></li>
+<li>json: A custom (JSON encoded) string</li>
+</ul>
+
+<p><strong>Note:</strong> The event is only being invoked in background if the app is not suspended!</p>
+
+<h4>Further informations</h4>
+
+<ul>
+<li>See the <a href="#get-notified-when-a-local-notification-has-been-triggered">ontrigger</a> event of how a listener can be registered to be notified when a local notification has been triggered.</li>
+</ul>
+
+<pre><code class="javascript">window.plugin.notification.local.onadd = function (id, state, json) {};
+</code></pre>
+
+<h3>Get notified when a local notification has been triggered</h3>
+
+<p>The <code>notification.local.ontrigger</code> interface can be used to get notified when a local notification has been triggered.</p>
+
+<p>The listener has to be a function and takes the following arguments:</p>
+
+<ul>
+<li>id: The ID of the notification</li>
+<li>state: Either <em>background</em> or <em>foreground</em></li>
+<li>json: A custom (JSON encoded) string</li>
+</ul>
+
+<p><strong>Note:</strong> The event is only being invoked in background if the app is running and is not suspended!</p>
+
+<h4>Further informations</h4>
+
+<ul>
+<li>See the <a href="#get-notified-when-the-user-has-been-clicked-on-a-local-notification">onclick</a> event of how a listener can be registered to be notified when the user has been clicked on a local notification.</li>
+</ul>
+
+<pre><code class="javascript">window.plugin.notification.local.ontrigger = function (id, state, json) {};
+</code></pre>
+
+<h3>Get notified when the user has been clicked on a local notification</h3>
+
+<p>The <code>notification.local.onclick</code> interface can be used to get notified when the user has been clicked on a local notification.</p>
+
+<p>The listener has to be a function and takes the following arguments:</p>
+
+<ul>
+<li>id: The ID of the notification</li>
+<li>state: Either <em>background</em> or <em>foreground</em></li>
+<li>json: A custom (JSON encoded) string</li>
+</ul>
+
+<p><strong>Note:</strong> The event is only being invoked in background if the app is not suspended!</p>
+
+<h4>Further informations</h4>
+
+<ul>
+<li>The <em>autoCancel</em> property can be used to either automatically cancel the local notification or not after it has been clicked by the user.</li>
+</ul>
+
+<pre><code class="javascript">window.plugin.notification.local.onclick = function (id, state, json) {};
+</code></pre>
+
+<h3>Get notified when a local notification has been canceled</h3>
+
+<p>The <code>notification.local.oncancel</code> interface can be used to get notified when a local notification has been canceled.</p>
+
+<p>The listener has to be a function and takes the following arguments:</p>
+
+<ul>
+<li>id: The ID of the notification</li>
+<li>state: Either <em>background</em> or <em>foreground</em></li>
+<li>json: A custom (JSON encoded) string</li>
+</ul>
+
+<p><strong>Note:</strong> The event is not being invoked if the local notification has been cleared in the notification center.</p>
+
+<h4>Further informations</h4>
+
+<ul>
+<li>The <em>autoCancel</em> property can be used to either automatically cancel the local notification or not after it has been clicked by the user.</li>
+<li>See <a href="#cancel-scheduled-local-notifications">cancel</a> and <a href="#cancel-all-scheduled-local-notifications">cancelAll</a> of how to cancel local notifications manually.</li>
+</ul>
+
+<pre><code class="javascript">window.plugin.notification.local.oncancel = function (id, state, json) {};
+</code></pre>
+
+<h2>Examples</h2>
+
+<h3>Scheduling a repeating local notification in the future</h3>
+
+<p>The following example shows how to schedule a local notification which will be triggered every week on this day, 60 seconds from now.</p>
+
+<pre><code class="javascript">var now                  = new Date().getTime(),
+    _60_seconds_from_now = new Date(now + 60*1000);
+
+window.plugin.notification.local.add({
+    id:      1,
+    title:   &#39;Reminder&#39;,
+    message: &#39;Dont forget to buy some flowers.&#39;,
+    repeat:  &#39;weekly&#39;,
+    date:    _60_seconds_from_now
+});
+</code></pre>
+
+<p><strong>Note:</strong> The notification can only be scheduled if the user has granted the <a href="#prompt-the-user-to-grant-permission-for-local-notifications">required permission</a>.</p>
+
+<h3>Scheduling an immediately triggered local notification</h3>
+
+<p>The example below shows how to schedule a local notification which will be triggered immediatly.</p>
+
+<pre><code class="javascript">window.plugin.notification.local.add({ message: &#39;Great app!&#39; });
+</code></pre>
+
+<h3>Schedule a silent local notification</h3>
+
+<p>By default the system sound for local notifications will be used. To turn off any sound the <em>sound</em> property has to be set to <em>NULL</em>.</p>
+
+<pre><code class="javascript">window.plugin.notification.local.add({ sound: null });
+</code></pre>
+
+<h3>Assign user data to the notification</h3>
+
+<p>If needed local notifications can be scheduled with any user data. That data can be accessed on each event listener. But cannot be modified later.</p>
+
+<pre><code class="javascript">window.plugin.notification.local.add({
+    id:         1,
+    message:    &#39;I love BlackBerry!&#39;,
+    json:       JSON.stringify({ test: 123 })
+});
+
+window.plugin.notification.local.onclick = function (id, state, json) {
+    console.log(id, JSON.parse(json).test);
+}
+</code></pre>
+
+<h3>Change the default value of local notification properties</h3>
+
+<p>The following example shows how to override the default value of the <em>autoCancel</em> property.</p>
+
+<pre><code class="javascript">window.plugin.notification.local.setDefaults({ autoCancel: true });
+</code></pre>
+
+<h2>Platform specifics</h2>
+
+<h3>Small and large icons on Android</h3>
+
+<p>By default all notifications will display the app icon. But an specific icon can be defined through the <code>icon</code> and <code>smallIcon</code> properties.</p>
+
+<pre><code class="javascript">/**
+ * Displays the &lt;package.name&gt;.R.drawable.ic_launcher icon
+ */
+window.plugin.notification.local.add({ icon: &#39;ic_launcher&#39; });
+
+/**
+ * Displays the android.R.drawable.ic_dialog_email icon
+ */
+window.plugin.notification.local.add({ smallIcon: &#39;ic_dialog_email&#39; });
+</code></pre>
+
+<h3>Notification sound on Android</h3>
+
+<p>The sound must be a absolute or relative Uri pointing to the sound file. The default sound is <code>RingtoneManager.TYPE_NOTIFICATION</code>.</p>
+
+<p><strong>Note:</strong> Local sound files must be placed into the res-folder and not into the assets-folder.</p>
+
+<pre><code class="javascript">/**
+ * Plays the `beep.mp3` which has to be located in the res folder
+ */
+window.plugin.notification.local.add({ sound: &#39;android.resource://&#39; + package_name + &#39;/raw/beep&#39; });
+
+/**
+ * Plays a remote sound
+ */
+window.plugin.notification.local.add({ sound: &#39;http://remotedomain/beep.mp3&#39; });
+
+/**
+ * Plays a sound file which has to be located in the android_assets folder
+ */
+window.plugin.notification.local.add({ sound: &#39;/www/audio/beep.mp3&#39; });
+
+/**
+ * Plays the `RingtoneManager.TYPE_ALARM` sound
+ */
+window.plugin.notification.local.add({ sound: &#39;TYPE_ALARM&#39; });
+</code></pre>
+
+<h3>Notification sound on iOS</h3>
+
+<p>You can package the audio data in an <em>aiff</em>, <em>wav</em>, or <em>caf</em> file. Then, in Xcode, add the sound file to your project as a nonlocalized resource of the application bundle. You may use the <em>afconvert</em> tool to convert sounds.</p>
+
+<p><strong>Note:</strong> The right to play notification sounds in the notification center settings has to be granted.<br>
+<strong>Note:</strong> Custom sounds must be under 30 seconds when played. If a custom sound is over that limit, the default system sound is played instead.</p>
+
+<pre><code class="javascript">/**
+ * Plays the `beep.mp3` which has to be located in the root folder of the project
+ */
+window.plugin.notification.local.add({ sound: &#39;beep.caf&#39; });
+
+/**
+ * Plays the `beep.mp3` which has to be located in the www folder
+ */
+window.plugin.notification.local.add({ sound: &#39;www/sounds/beep.caf&#39; });
+</code></pre>
+
+<h3>LiveTile background images on WP8</h3>
+
+<p>LiveTile&#39;s have the ability to display images for different sizes. These images can be defined through the <code>smallImage</code>, <code>image</code> and <code>wideImage</code> properties.</p>
+
+<p><strong>Note:</strong> An image must be defined as a relative or absolute URI. They can be restored to the default ones by canceling the notification.</p>
+
+<pre><code class="javascript">/**
+ * Displays the application icon as the livetile&#39;s background image
+ */
+window.plugin.notification.local.add({ image: &#39;appdata:ApplicationIcon.png&#39; })
+</code></pre>
+
+<h3>Custom repeating interval on Android</h3>
+
+<p>To specify a custom interval, the <code>repeat</code> property can be assigned with an number in minutes.</p>
+
+<pre><code class="javascript">/**
+ * Schedules the notification quarterly every 15 mins
+ */
+window.plugin.notification.local.add({ repeat: 15 });
+</code></pre>
+
+<h2>Quirks</h2>
+
+<h3>Local Notification limit on iOS</h3>
+
+<p>Each application on a device is limited to 64 scheduled local notifications.<br>
+The system discards scheduled notifications in excess of this limit, keeping only the 64 notifications that will fire the soonest. Recurring notifications are treated as a single notification.</p>
+
+<h3>Events aren&#39;t fired on iOS</h3>
+
+<p>After deploying/replacing the app on the device via Xcode no callback for previously scheduled local notifications aren&#39;t fired.</p>
+
+<h3>No sound is played on iOS 7</h3>
+
+<p>The right to play notification sounds in the notification center settings has to be granted.</p>
+
+<h3>Adding a notification on WP8</h3>
+
+<p>An application can only display one notification at a time. Each time a new notification has to be added, the application live tile&#39;s data will be overwritten by the new ones.</p>
+
+<h3>TypeError: Cannot read property &#39;currentVersion&#39; of null</h3>
+
+<p>Along with Cordova 3.2 and Windows Phone 8 the <code>version.bat</code> script has to be renamed to <code>version</code>.</p>
+
+<p>On Mac or Linux</p>
+
+<pre><code>mv platforms/wp8/cordova/version.bat platforms/wp8/cordova/version
+</code></pre>
+
+<p>On Windows</p>
+
+<pre><code>ren platforms\wp8\cordova\version.bat platforms\wp8\cordova\version
+</code></pre>
+
+<h3>Black screen (or app restarts) on Android after a notification was clicked</h3>
+
+<p>The launch mode for the main activity has to be set to <code>singleInstance</code></p>
+
+<pre><code class="xml">&lt;activity ... android:launchMode=&quot;singleInstance&quot; ... /&gt;
+</code></pre>
+
+<h2>Contributing</h2>
+
+<ol>
+<li>Fork it</li>
+<li>Create your feature branch (<code>git checkout -b my-new-feature</code>)</li>
+<li>Commit your changes (<code>git commit -am &#39;Add some feature&#39;</code>)</li>
+<li>Push to the branch (<code>git push origin my-new-feature</code>)</li>
+<li>Create new Pull Request</li>
+</ol>
+
+<h2>License</h2>
+
+<p>This software is released under the <a href="http://opensource.org/licenses/Apache-2.0">Apache 2.0 License</a>.</p>
+
+<p>© 2013-2014 appPlant UG, Inc. All rights reserved</p>
+</body>
+</html>

@@ -1,0 +1,160 @@
+<html>
+<head>
+	<title>org.apache.cordova.battery-status</title>
+</head>
+<body>
+<!---
+    Licensed to the Apache Software Foundation (ASF) under one
+    or more contributor license agreements.  See the NOTICE file
+    distributed with this work for additional information
+    regarding copyright ownership.  The ASF licenses this file
+    to you under the Apache License, Version 2.0 (the
+    "License"); you may not use this file except in compliance
+    with the License.  You may obtain a copy of the License at
+
+      http://www.apache.org/licenses/LICENSE-2.0
+
+    Unless required by applicable law or agreed to in writing,
+    software distributed under the License is distributed on an
+    "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+    KIND, either express or implied.  See the License for the
+    specific language governing permissions and limitations
+    under the License.
+-->
+
+<h1>org.apache.cordova.battery-status</h1>
+
+<p>This plugin provides an implementation of an old version of the <a href="http://www.w3.org/TR/2011/WD-battery-status-20110915/">Battery Status Events API</a>.</p>
+
+<p>It adds the following three <code>window</code> events:</p>
+
+<ul>
+<li>batterystatus</li>
+<li>batterycritical</li>
+<li>batterylow</li>
+</ul>
+
+<h2>Installation</h2>
+
+<pre><code>cordova plugin add org.apache.cordova.battery-status
+</code></pre>
+
+<h2>batterystatus</h2>
+
+<p>This event fires when the percentage of battery charge changes by at
+least 1 percent, or if the device is plugged in or unplugged.</p>
+
+<p>The battery status handler is passed an object that contains two
+properties:</p>
+
+<ul>
+<li><p><strong>level</strong>: The percentage of battery charge (0-100). <u>(Number)</u></p></li>
+<li><p><strong>isPlugged</strong>: A boolean that indicates whether the device is plugged in. <u>(Boolean)</u></p></li>
+</ul>
+
+<p>Applications typically should use <code>window.addEventListener</code> to
+attach an event listener after the <code>deviceready</code> event fires.</p>
+
+<h3>Supported Platforms</h3>
+
+<ul>
+<li>Amazon Fire OS</li>
+<li>iOS</li>
+<li>Android</li>
+<li>BlackBerry 10</li>
+<li>Windows Phone 7 and 8</li>
+<li>Tizen</li>
+<li>Firefox OS</li>
+</ul>
+
+<h3>Windows Phone 7 and 8 Quirks</h3>
+
+<p>Windows Phone 7 does not provide native APIs to determine battery
+level, so the <code>level</code> property is unavailable.  The <code>isPlugged</code>
+parameter <u>is</u> supported.</p>
+
+<h3>Example</h3>
+
+<pre><code>window.addEventListener(&quot;batterystatus&quot;, onBatteryStatus, false);
+
+function onBatteryStatus(info) {
+    // Handle the online event
+    console.log(&quot;Level: &quot; + info.level + &quot; isPlugged: &quot; + info.isPlugged);
+}
+</code></pre>
+
+<h2>batterycritical</h2>
+
+<p>The event fires when the percentage of battery charge has reached the
+critical battery threshold. The value is device-specific.</p>
+
+<p>The <code>batterycritical</code> handler is passed an object that contains two
+properties:</p>
+
+<ul>
+<li><p><strong>level</strong>: The percentage of battery charge (0-100). <u>(Number)</u></p></li>
+<li><p><strong>isPlugged</strong>: A boolean that indicates whether the device is plugged in. <u>(Boolean)</u></p></li>
+</ul>
+
+<p>Applications typically should use <code>window.addEventListener</code> to attach
+an event listener once the <code>deviceready</code> event fires.</p>
+
+<h3>Supported Platforms</h3>
+
+<ul>
+<li>Amazon Fire OS</li>
+<li>iOS</li>
+<li>Android</li>
+<li>BlackBerry 10</li>
+<li>Tizen</li>
+<li>Firefox OS</li>
+</ul>
+
+<h3>Example</h3>
+
+<pre><code>window.addEventListener(&quot;batterycritical&quot;, onBatteryCritical, false);
+
+function onBatteryCritical(info) {
+    // Handle the battery critical event
+    alert(&quot;Battery Level Critical &quot; + info.level + &quot;%\nRecharge Soon!&quot;);
+}
+</code></pre>
+
+<h2>batterylow</h2>
+
+<p>The event fires when the percentage of battery charge has reached the
+low battery threshold, device-specific value.</p>
+
+<p>The <code>batterylow</code> handler is passed an object that contains two
+properties:</p>
+
+<ul>
+<li><p><strong>level</strong>: The percentage of battery charge (0-100). <u>(Number)</u></p></li>
+<li><p><strong>isPlugged</strong>: A boolean that indicates whether the device is plugged in. <u>(Boolean)</u></p></li>
+</ul>
+
+<p>Applications typically should use <code>window.addEventListener</code> to
+attach an event listener once the <code>deviceready</code> event fires.</p>
+
+<h3>Supported Platforms</h3>
+
+<ul>
+<li>Amazon Fire OS</li>
+<li>iOS</li>
+<li>Android</li>
+<li>BlackBerry 10</li>
+<li>Tizen</li>
+<li>Firefox OS</li>
+</ul>
+
+<h3>Example</h3>
+
+<pre><code>window.addEventListener(&quot;batterylow&quot;, onBatteryLow, false);
+
+function onBatteryLow(info) {
+    // Handle the battery low event
+    alert(&quot;Battery Level Low &quot; + info.level + &quot;%&quot;);
+}
+</code></pre>
+</body>
+</html>

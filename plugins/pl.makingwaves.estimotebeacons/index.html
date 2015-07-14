@@ -1,0 +1,457 @@
+<html>
+<head>
+	<title>pl.makingwaves.estimotebeacons</title>
+</head>
+<body>
+<h1>JavaScript API guide for the Estimote Beacons Cordova plugin</h1>
+
+<h2>Notice</h2>
+
+<p>The JS API has been updated and now consists of two modules ,<q>estimote.beacons</q> and <q>estimote.nearables</q>, with support for Estimote Beacons and Estimote Stickers. <q>EstimoteBeacons</q> is kept for backwards compatibility, and points to <q>estimote.beacons</q>.</p>
+
+<p>See file <a href="changelog.md">changelog.md</a> for a list of all updates.</p>
+
+<h2>JavaScript API documentation</h2>
+
+<p>In addition to this document <a href="http://evomedia.evothings.com/jsdoc/phonegap-estimotebeacons/">JSDoc generated documentation</a> is available. This is based on the documentation comments in file
+<a href="plugin/src/js/EstimoteBeacons.js">EstimoteBeacons.js</a></p>
+
+<h2>Basic usage</h2>
+
+<p>Beacon ranging example:</p>
+
+<pre><code>estimote.beacons.startRangingBeaconsInRegion(
+    {}, // Empty region matches all beacons.
+    function(result) {
+        console.log(&#39;*** Beacons ranged ***&#39;)
+        estimote.beacons.printObject(result) },
+    function(errorMessage) {
+        console.log(&#39;Ranging error: &#39; + errorMessage) })
+</code></pre>
+
+<p>Stickers ranging example:</p>
+
+<pre><code>estimote.nearables.startRangingForType(
+    estimote.nearables.NearableTypeAll,
+    function(nearables) {
+        console.log(&#39;*** Stickers ranged ***&#39;)
+        estimote.beacons.printObject(nearables) },
+    function(errorMessage) {
+        console.log(&#39;Ranging error: &#39; + errorMessage) })
+</code></pre>
+
+<h2>Overview of the JavaScript API</h2>
+
+<p>The plugin currently supports:</p>
+
+<ul>
+<li>Monitoring beacons (iOS and Android)</li>
+<li>Ranging for beacons (iOS and Android)</li>
+<li>Scanning for beacons using CoreBluetooth (iOS)</li>
+<li>Requesting authorization for ranging/monitoring beacons on iOS</li>
+<li>Ranging for nearables (Estimote Stickers) (iOS)</li>
+<li>Monitoring for nearables (Estimote Stickers) (iOS)</li>
+<li>Monitoring for nearable triggers (Estimote Stickers) (iOS)</li>
+<li>Using Secure Beacons (iOS)</li>
+<li>Calling ESTConfig methods (iOS)</li>
+<li>Using an iPhone as a Virtual Beacon (iOS)</li>
+</ul>
+
+<p>Scanning is similar to ranging but uses a different underlying implementation than ranging does.</p>
+
+<h2>Estimote Beacons API</h2>
+
+<h3>Start and stop monitoring beacons (iOS and Android)</h3>
+
+<pre><code>estimote.beacons.startMonitoringForRegion(
+   region,
+    successCallback,
+    errorCallback)
+
+estimote.beacons.stopMonitoringForRegion(
+    region,
+    successCallback,
+    errorCallback)
+</code></pre>
+
+<p>Example:</p>
+
+<pre><code>function onMonitoringSuccess(regionState) {
+    console.log(&#39;State is &#39; + regionState.state)
+}
+
+estimote.beacons.startMonitoringForRegion(
+   region,
+    onMonitoringSuccess,
+    onError)
+</code></pre>
+
+<h3>Start and stop ranging beacons (iOS and Android)</h3>
+
+<pre><code>estimote.beacons.startRangingBeaconsInRegion(
+    region,
+    successCallback,
+    errorCallback)
+
+estimote.beacons.stopRangingBeaconsInRegion(
+    region,
+    successCallback,
+    errorCallback)
+</code></pre>
+
+<p>Example:</p>
+
+<pre><code>function onRangingSuccess(beaconInfo) {
+    console.log(&#39;Number of beacons ranged &#39; + beaconInfo.beacons.length)
+}
+
+estimote.beacons.startRangingBeaconsInRegion(
+    {},
+    onRangingSuccess,
+    onError)
+</code></pre>
+
+<h3>Start and stop scanning beacons (iOS only)</h3>
+
+<pre><code>estimote.beacons.startEstimoteBeaconsDiscoveryForRegion(
+    region,
+    successCallback,
+    errorCallback)
+
+estimote.beacons.stopEstimoteBeaconDiscovery(
+    region,
+    successCallback,
+    errorCallback)
+</code></pre>
+
+<p>Example:</p>
+
+<pre><code>function onDiscoverySuccess(beaconInfo) {
+    console.log(&#39;Number of beacons discovered &#39; + beaconInfo.beacons.length)
+}
+
+estimote.beacons.startEstimoteBeaconsDiscoveryForRegion(
+    {},
+    onDiscoverySuccess,
+    onError)
+</code></pre>
+
+<h3>Authorization (iOS 8 and above)</h3>
+
+<p>On iOS 8 your app should ask for permission to use location services (required for monitoring and ranging on iOS 8 - on Android and iOS 7 this function does nothing):</p>
+
+<pre><code>estimote.beacons.requestAlwaysAuthorization(
+    successCallback,
+    errorCallback)
+</code></pre>
+
+<p>Note that this is not needed for the Nearables API (Estimote Stickers).</p>
+
+<h3>How to access beacon data</h3>
+
+<p>When you use ranging or scanning, you have access to a variety of beacon properties. Different properties are available depending on whether ranging or scanning is used. (Note that during monitoring you don’t get data for individual beacons, rather you get data about regions entered and exited.)</p>
+
+<h3>Beacon properties available on iOS</h3>
+
+<p>Properties available both during ranging and scanning:</p>
+
+<ul>
+<li>major - major value of the beacon</li>
+<li>minor - minor value of the beacon</li>
+<li>color - one of estimote.beacons.BeaconColorUnknown, estimote.beacons.BeaconColorMint, estimote.beacons.BeaconColorIce, estimote.beacons.BeaconColorBlueberry, estimote.beacons.BeaconColorWhite, estimote.beacons.BeaconColorTransparent</li>
+<li>rssi - number representing the Received Signal Strength Indication</li>
+</ul>
+
+<p>Beacon properties available only when ranging:</p>
+
+<ul>
+<li>proximityUUID - UUID of the beacon</li>
+<li>distance - estimated distance from the beacon in meters</li>
+<li>proximity - one of estimote.beacons.ProximityUnknown, estimote.beacons.ProximityImmediate, estimote.beacons.ProximityNear, estimote.beacons.ProximityFar</li>
+</ul>
+
+<p>Beacon properties available only when scanning:</p>
+
+<ul>
+<li>macAddress</li>
+<li>measuredPower</li>
+</ul>
+
+<p>The full set of properties available on iOS are documented in the Estimote iOS SDK:
+<a href="http://estimote.github.io/iOS-SDK/Classes/ESTBeacon.html">http://estimote.github.io/iOS-SDK/Classes/ESTBeacon.html</a></p>
+
+<h3>Beacon properties available on Android</h3>
+
+<p>Beacon properties available when ranging:</p>
+
+<ul>
+<li>proximityUUID - UUID of the beacon</li>
+<li>major - major value of the beacon</li>
+<li>minor - minor value of the beacon</li>
+<li>rssi - number representing the Received Signal Strength Indication</li>
+<li>name - the name advertised by the beacon</li>
+<li>macAddress</li>
+<li>measuredPower</li>
+</ul>
+
+<p>The properties available on Android are documented in the <a href="http://estimote.github.io/Android-SDK/JavaDocs/index.html?com/estimote/sdk/Beacon.html">Estimote Android SDK</a></p>
+
+<h3>Beacon code example</h3>
+
+<p>Using the above data you can do all sorts of things, identify which beacons are close, how far they are, if they are close, and so on. Here is an example of how to access the beacon distance property:</p>
+
+<pre><code>var region = { identifier: &#39;MyRegion&#39; }
+
+estimote.beacons.startRangingBeaconsInRegion(
+    region,
+    onBeaconsRanged,
+    onError)
+
+function onBeaconsRanged(beaconInfo)
+{
+    // Sort beacons by distance.
+    beaconInfo.beacons.sort(function(beacon1, beacon2) {
+        return beacon1.distance &gt; beacon2.distance })
+
+    // Log distance for the closest beacon.
+    var beacon = beaconInfo.beacons[0]
+    console.log(&#39;Closest beacon is &#39; + beacon.distance + &#39;m away&#39;)
+}
+
+function onError(error)
+{
+    console.log(&#39;Start ranging error: &#39; + error)
+}
+</code></pre>
+
+<h3>Secure Beacons (iOS)</h3>
+
+<p>You can use Estimote Secure Beacons from JavaScript.</p>
+
+<p>Two steps are needed. First set the App ID and App Token. Second set the &#39;secure&#39; property of the region you are using for monitoring/ranging to true.</p>
+
+<p>Here is an example:</p>
+
+<pre><code>// Step 1: Set App ID and App Token.
+estimote.beacons.setupAppIDAndAppToken(&#39;MyAppID&#39;, &#39;MyAppToken&#39;)
+
+// Step 2: Specify secure field in region object.
+var region = { identifier: &#39;MyRegion&#39;, secure: true }
+estimote.beacons.startRangingBeaconsInRegion(
+    region,
+    onBeaconsRanged,
+    onError)
+</code></pre>
+
+<p>Read more about Secure Beacons in this article: <a href="https://community.estimote.com/hc/en-us/articles/204233603-How-security-feature-works">https://community.estimote.com/hc/en-us/articles/204233603-How-security-feature-works</a></p>
+
+<h3>Virtual Beacons (iOS)</h3>
+
+<p>A virtual beacon is an iOS device acting as an Estimote Beacon.</p>
+
+<p>Here is how you turn your iPhone into a Beacon using the JavaScript API.</p>
+
+<p>Function startAdvertisingAsBeacon starts advertising as a beacon:</p>
+
+<pre><code>estimote.beacons.startAdvertisingAsBeacon(
+    UUIDString
+    majorValue,
+    minorValue,
+    regionName,
+    successCallback,
+    errorCallback)
+</code></pre>
+
+<p>Example that starts advertising:</p>
+
+<pre><code>estimote.beacons.startAdvertisingAsBeacon(
+    &#39;B9407F30-F5F8-466E-AFF9-25556B57FE6D&#39;, // UUID
+    1, // Major
+    1, // Minor
+    &#39;MyRegion&#39;, // Region name (not visible?)
+    function(result) {
+        console.log(&#39;Beacon started&#39;) },
+    function(errorMessage) {
+        console.log(&#39;Error starting beacon: &#39; + errorMessage) })
+</code></pre>
+
+<p>Now you can run an Estimote Beacon scanning app on another device and your iPhone should be detected. Remember to use the same UUID when ranging/monitoring as the one used in the call to startAdvertisingAsBeacon.</p>
+
+<p>Function stopAdvertisingAsBeacon stops advertising:</p>
+
+<pre><code>estimote.beacons.stopAdvertisingAsBeacon(
+    successCallback,
+    errorCallback)
+</code></pre>
+
+<p>Here is an example:</p>
+
+<pre><code>estimote.beacons.stopAdvertisingAsBeacon(
+    function(result) {
+        console.log(&#39;Beacon stopped&#39;) },
+    function(errorMessage) {
+        console.log(&#39;Error stopping beacon: &#39; + errorMessage) })
+</code></pre>
+
+<h2>Nearables API for iOS (Estimote Stickers)</h2>
+
+<h3>Start and stop ranging nearables (iOS only)</h3>
+
+<p>You can range for nearables by type:</p>
+
+<pre><code>estimote.nearables.startRangingForType(
+    estimote.nearables.NearableTypeAll,
+    successCallback,
+    errorCallback)
+
+estimote.nearables.stopRangingForType(
+    estimote.nearables.NearableTypeAll,
+    successCallback,
+    errorCallback)
+</code></pre>
+
+<p>Example successCallback function used when ranging for type (note that the callback gets an array of nearables):</p>
+
+<pre><code>function successCallback(nearables) {
+    console.log(&#39;Number of ranged nearables: &#39; + nearables.length) }
+</code></pre>
+
+<p>Or you can range for a specific beacon using the unique nearable identifier:</p>
+
+<pre><code>estimote.nearables.startRangingForIdentifier(
+    identifier,
+    successCallback,
+    errorCallback)
+
+estimote.nearables.stopRangingForIdentifier(
+    identifier,
+    successCallback,
+    errorCallback)
+</code></pre>
+
+<p>Example successCallback function used when ranging for identifier (note that the callback gets a single nearable):</p>
+
+<pre><code>function successCallback(nearable) {
+    console.log(&#39;Ranged nearable: &#39; + nearable.nameForType) }
+</code></pre>
+
+<p>Stop all ongoing nearable ranging:</p>
+
+<pre><code>estimote.nearables.stopRanging()
+</code></pre>
+
+<h3>Nearable properties available when ranging</h3>
+
+<ul>
+<li>type: number</li>
+<li>nameForType: string</li>
+<li>color: number</li>
+<li>nameForColor: string</li>
+<li>identifier: string</li>
+<li>hardwareVersion: string</li>
+<li>firmwareVersion: string</li>
+<li>rssi: number</li>
+<li>zone: number</li>
+<li>idleBatteryVoltage: number</li>
+<li>stressBatteryVoltage: number</li>
+<li>currentMotionStateDuration: number</li>
+<li>previousMotionStateDuration: number</li>
+<li>isMoving: bool</li>
+<li>orientation: number</li>
+<li>xAcceleration: number</li>
+<li>yAcceleration: number</li>
+<li>zAcceleration: number</li>
+<li>temperature: number</li>
+<li>power: number</li>
+<li>firmwareState: number</li>
+</ul>
+
+<h3>Start and stop monitoring nearables (iOS only)</h3>
+
+<p>You can monitor for nearables by type:</p>
+
+<pre><code>estimote.nearables.startMonitoringForType(
+    estimote.nearables.NearableTypeDog,
+    successCallback,
+    errorCallback)
+
+estimote.nearables.stopMonitoringForType(
+    estimote.nearables.NearableTypeDog,
+    successCallback,
+    errorCallback)
+</code></pre>
+
+<p>Example successCallback function used when monitoring for type:</p>
+
+<pre><code>function successCallback(state) {
+    console.log(&#39;Type: &#39; + state.type + &#39; state: &#39; + state.state) }
+</code></pre>
+
+<p>Or you can monitor by the unique nearable identifier:</p>
+
+<pre><code>estimote.nearables.startMonitoringForIdentifier(
+    identifier,
+    successCallback,
+    errorCallback)
+
+estimote.nearables.stopMonitoringForIdentifier(
+    identifier,
+    successCallback,
+    errorCallback)
+</code></pre>
+
+<p>Example successCallback function used when monitoring for identifier:</p>
+
+<pre><code>function successCallback(state) {
+    console.log(&#39;Identifier: &#39; + state.identifier + &#39; state: &#39; + state.state) }
+</code></pre>
+
+<p>Stop all ongoing nearable monitoring:</p>
+
+<pre><code>estimote.nearables.stopRanging()
+</code></pre>
+
+<h3>Using triggers with nearables (iOS only)</h3>
+
+<p>The Estimote trigger engine can be used to monitor for nearables using rules. In general, you use one rule for each nearable you wish to monitor. A trigger can contain one or more rules.</p>
+
+<p>Each rule has en update function that is called by the trigger engine. The update function gets a nearable as a parameter and can inspect the properties of the nearable to determine if the rule holds true or not. The rule function should then call into the trigger engine and pass true or false to make the engine update the state for the trigger.</p>
+
+<p>The actual trigger monitoring callback function is called when the trigger as a whole changes its state. The state is true if all rules hold, and false otherwise. The trigger callback is only called when the compound trigger state is changed. Update functions for individual rules are called continuously.</p>
+
+<p>Here is a code example to give a taste of this style of coding. The trigger we monitor for tells us if our dos is moving or is still (assuming we have attached a Dog Sticker to our dog ;)</p>
+
+<pre><code>// Called when trigger changes state.
+function onTriggerChangedState(trigger) {
+    if (trigger.state)
+        console.log(&#39;Dog is moving&#39;)
+    else
+        console.log(&#39;Dog is still&#39;)
+}
+
+// Called is case of error.
+function onTriggerError(errorMessage) {
+    console.log(&#39;Trigger error: &#39; + errorMessage)
+}
+
+// Trigger rule.
+dogIsMovingRule = estimote.triggers.createRuleForNearable(
+    estimote.nearables.NearableTypeDog,
+    estimote.triggers.rules.nearableIsMoving())
+
+// Trigger.
+trigger = estimote.triggers.createTrigger(&#39;DogTrigger&#39;, [dogIsMovingRule])
+
+// Start monitoring for trigger.
+estimote.triggers.startMonitoringForTrigger(
+    trigger,
+    onTriggerChangedState,
+    onTriggerError)
+</code></pre>
+
+<p>And here is how to stop monitoring a trigger:</p>
+
+<pre><code>estimote.triggers.stopMonitoringForTrigger(trigger)
+</code></pre>
+</body>
+</html>

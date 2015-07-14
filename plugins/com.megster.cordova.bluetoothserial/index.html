@@ -1,0 +1,516 @@
+<html>
+<head>
+	<title>com.megster.cordova.bluetoothserial</title>
+</head>
+<body>
+<h1>Bluetooth Serial Plugin for PhoneGap</h1>
+
+<p>This plugin enables serial communication over Bluetooth. It was written for communicating between Android or iOS and an Arduino.</p>
+
+<p>Android uses Classic Bluetooth.  iOS uses Bluetooth Low Energy.</p>
+
+<h2>Supported Platforms</h2>
+
+<ul>
+<li>Android</li>
+<li>iOS with <a href="http://redbearlab.com">RedBearLab</a> BLE hardware, <a href="http://www.adafruit.com/products/1697">Adafruit Bluefruit LE</a>, or <a href="http://www.lairdtech.com/Products/Embedded-Wireless-Solutions/Bluetooth-Radio-Modules/BL600-Series/#.VBI7AS5dUzI">Laird BL600</a></li>
+</ul>
+
+<p><a href="#supporting-other-ble-hardware">Supporting other Bluetooth Low Energy hardware</a></p>
+
+<h2>Limitations</h2>
+
+<ul>
+<li>The phone must initiate the Bluetooth connection</li>
+<li>Data sent over the connection is assumed to be Strings</li>
+<li>iOS Bluetooth Low Energy requires iPhone 4S, iPhone5, iPod 5, or iPad3+</li>
+<li>Will <em>not</em> connect Android to Android</li>
+<li>Will <em>not</em> connect iOS to iOS<a href="https://github.com/don/BluetoothSerial/issues/75#issuecomment-52591397">*</a></li>
+</ul>
+
+<h1>Installing</h1>
+
+<p>Install with Cordova cli</p>
+
+<pre><code>$ cordova plugin add com.megster.cordova.bluetoothSerial
+</code></pre>
+
+<p>This plugin is also available for <a href="https://build.phonegap.com/plugins/366">PhoneGap Build</a></p>
+
+<h1>Examples</h1>
+
+<p>There are some <a href="https://github.com/don/BluetoothSerial/tree/master/examples">sample projects</a> included with the plugin.</p>
+
+<h1>API</h1>
+
+<h2>Methods</h2>
+
+<ul>
+<li><a href="#connect">bluetoothSerial.connect</a></li>
+<li><a href="#connectInsecure">bluetoothSerial.connectInsecure</a></li>
+<li><a href="#disconnect">bluetoothSerial.disconnect</a></li>
+<li><a href="#write">bluetoothSerial.write</a></li>
+<li><a href="#available">bluetoothSerial.available</a></li>
+<li><a href="#read">bluetoothSerial.read</a></li>
+<li><a href="#readuntil">bluetoothSerial.readUntil</a></li>
+<li><a href="#subscribe">bluetoothSerial.subscribe</a></li>
+<li><a href="#unsubscribe">bluetoothSerial.unsubscribe</a></li>
+<li><a href="#clear">bluetoothSerial.clear</a></li>
+<li><a href="#list">bluetoothSerial.list</a></li>
+<li><a href="#isenabled">bluetoothSerial.isEnabled</a></li>
+<li><a href="#isconnected">bluetoothSerial.isConnected</a></li>
+<li><a href="#readrssi">bluetoothSerial.readRSSI</a></li>
+</ul>
+
+<h2>connect</h2>
+
+<p>Connect to a Bluetooth device.</p>
+
+<pre><code>bluetoothSerial.connect(macAddress_or_uuid, connectSuccess, connectFailure);
+</code></pre>
+
+<h3>Description</h3>
+
+<p>Function <code>connect</code> connects to a Bluetooth device.  The callback is long running.  Success will be called when the connection is successful.  Failure is called if the connection fails, or later if the connection disconnects. An error message is passed to the failure callback.</p>
+
+<h4>Android</h4>
+
+<p>For Android, <code>connect</code> takes a macAddress of the remote device.  </p>
+
+<h4>iOS</h4>
+
+<p>For iOS, <code>connect</code> takes the UUID of the remote device.  Optionally, you can pass an <strong>empty string</strong> and the plugin will connect to the first BLE peripheral.</p>
+
+<h3>Parameters</h3>
+
+<ul>
+<li><strong>macAddress_or_uuid</strong>: Identifier of the remote device.</li>
+<li><strong>connectSuccess</strong>: Success callback function that is invoked when the connection is successful.</li>
+<li><strong>connectFailure</strong>: Error callback function, invoked when error occurs or the connection disconnects.</li>
+</ul>
+
+<h2>connectInsecure</h2>
+
+<p>Connect insecurely to a Bluetooth device.</p>
+
+<pre><code>bluetoothSerial.connectInsecure(macAddress, connectSuccess, connectFailure);
+</code></pre>
+
+<h3>Description</h3>
+
+<p>Function <code>connectInsecure</code> works like <a href="#connect">connect</a>, but creates an insecure connection to a Bluetooth device.  See the <a href="http://goo.gl/1mFjZY">Android docs</a> for more information.</p>
+
+<h4>Android</h4>
+
+<p>For Android, <code>connectInsecure</code> takes a macAddress of the remote device.  </p>
+
+<h4>iOS</h4>
+
+<p><code>connectInsecure</code> is <strong>not supported</strong> on iOS.</p>
+
+<h3>Parameters</h3>
+
+<ul>
+<li><strong>macAddress</strong>: Identifier of the remote device.</li>
+<li><strong>connectSuccess</strong>: Success callback function that is invoked when the connection is successful.</li>
+<li><strong>connectFailure</strong>: Error callback function, invoked when error occurs or the connection disconnects.</li>
+</ul>
+
+<h2>disconnect</h2>
+
+<p>Disconnect.</p>
+
+<pre><code>bluetoothSerial.disconnect([success], [failure]);
+</code></pre>
+
+<h3>Description</h3>
+
+<p>Function <code>disconnect</code> disconnects the current connection.</p>
+
+<h3>Parameters</h3>
+
+<ul>
+<li><strong>success</strong>: Success callback function that is invoked when the connection is successful. [optional]</li>
+<li><strong>failure</strong>: Error callback function, invoked when error occurs. [optional]</li>
+</ul>
+
+<h2>write</h2>
+
+<p>Writes data to the serial port.</p>
+
+<pre><code>bluetoothSerial.write(data, success, failure);
+</code></pre>
+
+<h3>Description</h3>
+
+<p>Function <code>write</code> data to the serial port.  Data must be a String.</p>
+
+<h3>Parameters</h3>
+
+<ul>
+<li><strong>success</strong>: Success callback function that is invoked when the connection is successful. [optional]</li>
+<li><strong>failure</strong>: Error callback function, invoked when error occurs. [optional]</li>
+</ul>
+
+<h2>available</h2>
+
+<p>Gets the number of bytes of data available.</p>
+
+<pre><code>bluetoothSerial.available(success, failure);
+</code></pre>
+
+<h3>Description</h3>
+
+<p>Function <code>available</code> gets the number of bytes of data available.  The bytes are passed as a parameter to the success callback.</p>
+
+<h3>Parameters</h3>
+
+<ul>
+<li><strong>success</strong>: Success callback function that is invoked when the connection is successful. [optional]</li>
+<li><strong>failure</strong>: Error callback function, invoked when error occurs. [optional]</li>
+</ul>
+
+<h3>Quick Example</h3>
+
+<pre><code>bluetoothSerial.available(function (numBytes) {
+    console.log(&quot;There are &quot; + numBytes + &quot; available to read.&quot;);
+}, failure);
+</code></pre>
+
+<h2>read</h2>
+
+<p>Reads data from the buffer.</p>
+
+<pre><code>bluetoothSerial.read(success, failure);
+</code></pre>
+
+<h3>Description</h3>
+
+<p>Function <code>read</code> reads the data from the buffer. The data is passed to the success callback as a String.  Calling <code>read</code> when no data is available will pass an empty String to the callback.</p>
+
+<h3>Parameters</h3>
+
+<ul>
+<li><strong>success</strong>: Success callback function that is invoked with the number of bytes available to be read.</li>
+<li><strong>failure</strong>: Error callback function, invoked when error occurs. [optional]</li>
+</ul>
+
+<h3>Quick Example</h3>
+
+<pre><code>bluetoothSerial.read(function (data) {
+    console.log(data);
+}, failure);
+</code></pre>
+
+<h2>readUntil</h2>
+
+<p>Reads data from the buffer until it reaches a delimiter.</p>
+
+<pre><code>bluetoothSerial.readUntil(&#39;\n&#39;, success, failure);
+</code></pre>
+
+<h3>Description</h3>
+
+<p>Function <code>readUntil</code> reads the data from the buffer until it reaches a delimiter.  The data is passed to the success callback as a String.  If the buffer does not contain the delimiter, an empty String is passed to the callback. Calling <code>read</code> when no data is available will pass an empty String to the callback.</p>
+
+<h3>Parameters</h3>
+
+<ul>
+<li><strong>delimiter</strong>: delimiter</li>
+<li><strong>success</strong>: Success callback function that is invoked with the data.</li>
+<li><strong>failure</strong>: Error callback function, invoked when error occurs. [optional]</li>
+</ul>
+
+<h3>Quick Example</h3>
+
+<pre><code>bluetoothSerial.readUntil(&#39;\n&#39;, function (data) {
+    console.log(data);
+}, failure);
+</code></pre>
+
+<h2>subscribe</h2>
+
+<p>Subscribe to be notified when data is received.</p>
+
+<pre><code>bluetoothSerial.subscribe(&#39;\n&#39;, success, failure);
+</code></pre>
+
+<h3>Description</h3>
+
+<p>Function <code>subscribe</code> registers a callback that is called when data is received.  A delimiter must be specified.  The callback is called with the data as soon as the delimiter string is read.  The callback is a long running callback and will exist until <code>unsubscribe</code> is called.</p>
+
+<h3>Parameters</h3>
+
+<ul>
+<li><strong>delimiter</strong>: delimiter</li>
+<li><strong>success</strong>: Success callback function that is invoked with the data.</li>
+<li><strong>failure</strong>: Error callback function, invoked when error occurs. [optional]</li>
+</ul>
+
+<h3>Quick Example</h3>
+
+<pre><code>// the success callback is called whenever data is received
+bluetoothSerial.subscribe(&#39;\n&#39;, function (data) {
+    console.log(data);
+}, failure);
+</code></pre>
+
+<h2>unsubscribe</h2>
+
+<p>Unsubscribe from a subscription.</p>
+
+<pre><code>bluetoothSerial.unsubscribe(success, failure);
+</code></pre>
+
+<h3>Description</h3>
+
+<p>Function <code>unsubscribe</code> removes any notification added by <code>subscribe</code> and kills the callback.</p>
+
+<h3>Parameters</h3>
+
+<ul>
+<li><strong>success</strong>: Success callback function that is invoked when the connection is successful. [optional]</li>
+<li><strong>failure</strong>: Error callback function, invoked when error occurs. [optional]</li>
+</ul>
+
+<h3>Quick Example</h3>
+
+<pre><code>bluetoothSerial.unsubscribe();
+</code></pre>
+
+<h2>clear</h2>
+
+<p>Clears data in the buffer.</p>
+
+<pre><code>bluetoothSerial.clear(success, failure);
+</code></pre>
+
+<h3>Description</h3>
+
+<p>Function <code>clear</code> removes any data from the receive buffer.</p>
+
+<h3>Parameters</h3>
+
+<ul>
+<li><strong>success</strong>: Success callback function that is invoked when the connection is successful. [optional]</li>
+<li><strong>failure</strong>: Error callback function, invoked when error occurs. [optional]</li>
+</ul>
+
+<h2>list</h2>
+
+<p>Lists bonded devices</p>
+
+<pre><code>bluetoothSerial.list(success, failure);
+</code></pre>
+
+<h3>Description</h3>
+
+<h4>Android</h4>
+
+<p>Function <code>list</code> lists the paired Bluetooth devices.  The success callback is called with a list of objects.</p>
+
+<p>Example list passed to success callback.  See <a href="http://developer.android.com/reference/android/bluetooth/BluetoothDevice.html#getName()">BluetoothDevice</a> and <a href="http://developer.android.com/reference/android/bluetooth/BluetoothClass.html#getDeviceClass()">BluetoothClass#getDeviceClass</a>.</p>
+
+<pre><code>[{
+    &quot;class&quot;: 276,
+    &quot;id&quot;: &quot;10:BF:48:CB:00:00&quot;,
+    &quot;address&quot;: &quot;10:BF:48:CB:00:00&quot;,
+    &quot;name&quot;: &quot;Nexus 7&quot;
+}, {
+    &quot;class&quot;: 7936,
+    &quot;id&quot;: &quot;00:06:66:4D:00:00&quot;,
+    &quot;address&quot;: &quot;00:06:66:4D:00:00&quot;,
+    &quot;name&quot;: &quot;RN42&quot;
+}]
+</code></pre>
+
+<h4>iOS</h4>
+
+<p>Function <code>list</code> lists the discovered Bluetooth Low Energy peripheral.  The success callback is called with a list of objects.</p>
+
+<p>Example list passed to success callback for iOS.</p>
+
+<pre><code>[{
+    &quot;id&quot;: &quot;CC410A23-2865-F03E-FC6A-4C17E858E11E&quot;,
+    &quot;uuid&quot;: &quot;CC410A23-2865-F03E-FC6A-4C17E858E11E&quot;,
+    &quot;name&quot;: &quot;Biscuit&quot;,
+    &quot;rssi&quot;: -68
+}]
+</code></pre>
+
+<p>The advertised RSSI <strong>may</strong> be included if available.</p>
+
+<p><code>id</code> is the generic name for <code>uuid</code> or [mac]<code>address</code> so that code can be platform independent.</p>
+
+<h3>Parameters</h3>
+
+<ul>
+<li><strong>success</strong>: Success callback function that is invoked with a list of bonded devices.</li>
+<li><strong>failure</strong>: Error callback function, invoked when error occurs. [optional]</li>
+</ul>
+
+<h3>Quick Example</h3>
+
+<pre><code>bluetoothSerial.list(function(devices) {
+    devices.forEach(function(device) {
+        console.log(device.id);
+    })
+}, failure);
+</code></pre>
+
+<h2>isConnected</h2>
+
+<p>Reports the connection status.</p>
+
+<pre><code>bluetoothSerial.isConnected(success, failure);
+</code></pre>
+
+<h3>Description</h3>
+
+<p>Function <code>isConnected</code> calls the success callback when connected to a peer and the failure callback when <em>not</em> connected.</p>
+
+<h3>Parameters</h3>
+
+<ul>
+<li><strong>success</strong>: Success callback function, invoked when device connected.</li>
+<li><strong>failure</strong>: Error callback function, invoked when device is NOT connected.</li>
+</ul>
+
+<h3>Quick Example</h3>
+
+<pre><code>bluetoothSerial.isConnected(
+    function() {
+        console.log(&quot;Bluetooth is connected&quot;);
+    },
+    function() {
+        console.log(&quot;Bluetooth is *not* connected&quot;);
+    }
+);
+</code></pre>
+
+<h2>isEnabled</h2>
+
+<p>Reports if bluetooth is enabled.</p>
+
+<pre><code>bluetoothSerial.isEnabled(success, failure);
+</code></pre>
+
+<h3>Description</h3>
+
+<p>Function <code>isEnabled</code> calls the success callback when bluetooth is enabled and the failure callback when bluetooth is <em>not</em> enabled.</p>
+
+<h3>Parameters</h3>
+
+<ul>
+<li><strong>success</strong>: Success callback function, invoked when Bluetooth is enabled.</li>
+<li><strong>failure</strong>: Error callback function, invoked when Bluetooth is NOT enabled.</li>
+</ul>
+
+<h3>Quick Example</h3>
+
+<pre><code>bluetoothSerial.isEnabled(
+    function() {
+        console.log(&quot;Bluetooth is enabled&quot;);
+    },
+    function() {
+        console.log(&quot;Bluetooth is *not* enabled&quot;);
+    }
+);
+</code></pre>
+
+<h2>readRSSI</h2>
+
+<p>Reads the RSSI from the connected peripheral.</p>
+
+<pre><code>bluetoothSerial.readRSSI(success, failure);
+</code></pre>
+
+<h3>Description</h3>
+
+<p>Function <code>readRSSI</code> calls the success callback with the rssi.</p>
+
+<p><strong>BLE only</strong> <em>This function is experimental and the API may change</em></p>
+
+<h3>Parameters</h3>
+
+<ul>
+<li><strong>success</strong>: Success callback function that is invoked with the rssi value.</li>
+<li><strong>failure</strong>: Error callback function, invoked when error occurs. [optional]</li>
+</ul>
+
+<h3>Quick Example</h3>
+
+<pre><code>bluetoothSerial.readRSSI(
+    function(rssi) {
+        console.log(rssi);
+    }
+);
+</code></pre>
+
+<h1>Misc</h1>
+
+<h2>Where does this work?</h2>
+
+<h3>Android</h3>
+
+<p>Current development is done with Cordova 3.4 on Android 4.x. Theoretically this code runs on PhoneGap 2.9 and greater.  It should support Android-10 (2.3.2) and greater, but I only test with Android 4.x.</p>
+
+<p>Development Devices include</p>
+
+<ul>
+<li>Nexus 5 with Android 4.4</li>
+<li>Samsung Galaxy Tab 10.1 (GT-P7510) with Android 4.0.4 (see <a href="https://github.com/don/BluetoothSerial/issues/8">Issue #8</a>)</li>
+<li>Google Nexus S with Android 4.1.2</li>
+<li>Nexus 4 with Android 4.2.2</li>
+<li>Samsung Galaxy S4 with Android 4.3</li>
+</ul>
+
+<p>On the Arduino side I test with <a href="https://www.sparkfun.com/products/10393">Sparkfun Mate Silver</a> and the <a href="http://www.seeedstudio.com/depot/bluetooth-shield-p-866.html?cPath=19_21">Seeed Studio Bluetooth Shield</a>. The code should be generic and work with most hardware.</p>
+
+<p>I highly recommend <a href="http://www.adafruit.com/products/1588">Adafruit&#39;s Bluefruit EZ-Link</a>.</p>
+
+<h3>iOS</h3>
+
+<p><strong>NOTE: Currently iOS only works with RedBear Labs Hardware and Adafruit Bluefruit LE</strong></p>
+
+<p>This plugin is developed with Cordova 3.4 using iOS 7.x on an iPhone 5s connecting to a <a href="http://redbearlab.com/blemini">RedBearLab BLEMini</a>.</p>
+
+<p>Ensure that you have update the BLE Mini firmware to at least <a href="https://github.com/RedBearLab/Biscuit/tree/master/release">Biscuit-UART_20130313.bin</a>.</p>
+
+<h3>Supporting other BLE hardware</h3>
+
+<p>For Bluetooth Low Energy, this plugin supports the RedBear Labs hardware by default, but can support any Bluetooth Low Energy hardware with a <q>serial like</q> service. This means a transmit characteristic that is writable and a receive characteristic that supports notification.</p>
+
+<p>Edit <a href="src/ios/BLEDefines.h">BLEdefines.h</a> and adjust the UUIDs for your service.</p>
+
+<h2>Props</h2>
+
+<h3>Android</h3>
+
+<p>Most of the Bluetooth implementation was borrowed from the Bluetooth Chat example in the Android SDK.</p>
+
+<h3>iOS</h3>
+
+<p>The iOS code uses RedBearLab&#39;s <a href="https://github.com/RedBearLab/iOS/tree/master/BLEFramework/BLE">BLE_Framework</a>.</p>
+
+<h3>API</h3>
+
+<p>The API for available, read, readUntil was influenced by the <a href="https://github.com/arduino/BtSerial">BtSerial Library for Processing for Arduino</a></p>
+
+<h2>Wrong Bluetooth Plugin?</h2>
+
+<p>If you don&#39;t need <strong>serial</strong> over Bluetooth, try the <a href="https://github.com/phonegap/phonegap-plugins/tree/DEPRECATED/Android/Bluetooth/2.2.0">PhoneGap Bluetooth Plugin for Android</a> or perhaps <a href="https://github.com/tanelih/phonegap-bluetooth-plugin">phonegap-plugin-bluetooth</a>.</p>
+
+<p>If you need generic Bluetooth Low Energy support checkout my <a href="https://github.com/don/cordova-plugin-ble-central">Cordova BLE Plugin</a>.</p>
+
+<p>If you need BLE for RFduino checkout my <a href="https://github.com/don/cordova-plugin-rfduino">RFduino Plugin</a>.</p>
+
+<h2>What format should the Mac Address be in?</h2>
+
+<p>An example a properly formatted mac address is <code>AA:BB:CC:DD:EE:FF</code></p>
+
+<h2>Feedback</h2>
+
+<p>Try the code. If you find an problem or missing feature, file an issue or create a pull request.</p>
+</body>
+</html>

@@ -1,0 +1,336 @@
+<html>
+<head>
+	<title>com.unarin.cordova.beacon</title>
+</head>
+<body>
+<!---
+ license: Licensed to the Apache Software Foundation (ASF) under one
+         or more contributor license agreements.  See the NOTICE file
+         distributed with this work for additional information
+         regarding copyright ownership.  The ASF licenses this file
+         to you under the Apache License, Version 2.0 (the
+         "License"); you may not use this file except in compliance
+         with the License.  You may obtain a copy of the License at
+
+           http://www.apache.org/licenses/LICENSE-2.0
+
+         Unless required by applicable law or agreed to in writing,
+         software distributed under the License is distributed on an
+         "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+         KIND, either express or implied.  See the License for the
+         specific language governing permissions and limitations
+         under the License.
+-->
+
+<h2><img src="Bluetooth-icon.png" alt="iBeacon Cordova Plugin" /> Cordova / Phonegap iBeacon plugin</h2>
+
+<h3>Features</h3>
+
+<h4>Features available on both Android and iOS</h4>
+
+<ul>
+<li>Ranging</li>
+<li>Monitoring</li>
+</ul>
+
+<h4>Features exclusive to iOS</h4>
+
+<ul>
+<li>Region Monitoring (or geo fencing), works in all app states. </li>
+<li>Advertising device as an iBeacon</li>
+</ul>
+
+<h3>Installation</h3>
+
+<pre><code>cordova plugin add https://github.com/petermetz/cordova-plugin-ibeacon.git
+</code></pre>
+
+<h3>Usage</h3>
+
+<p>The plugin&#39;s API closely mimics the one exposed through the <a href="https://developer.apple.com/library/ios/documentation/CoreLocation/Reference/CLLocationManager_Class/CLLocationManager/CLLocationManager.html">CLLocationManager</a> introduced in iOS 7.</p>
+
+<p>Since version 2, the main <code>IBeacon</code> facade of the DOM is called <code>LocationManager</code> and it&#39;s API is based on promises instead of callbacks.
+Another important change of version 2 is that it no longer pollutes the global namespace, instead all the model classes and utilities are accessible
+through the <code>cordova.plugins.locationManager</code> reference chain.</p>
+
+<h4>iOS 8 Permissions</h4>
+
+<p>On iOS 8, you have to request permissions from the user of your app explicitly. You can do this through the plugin&#39;s API.
+See the <a href="https://github.com/petermetz/cordova-plugin-ibeacon/blob/master/www/LocationManager.js">LocationManager</a>&#39;s 
+related methods: <code>requestWhenInUseAuthorization</code> and <code>requestWhenInUseAuthorization</code> for further details.</p>
+
+<h4>Standard <a href="https://developer.apple.com/library/ios/documentation/CoreLocation/Reference/CLLocationManager_Class/CLLocationManager/CLLocationManager.html">CLLocationManager</a> functions</h4>
+
+<h5>Creating BeaconRegion DTOs</h5>
+
+<pre><code>/**
+ * Function that creates a BeaconRegion data transfer object.
+ * 
+ * @throws Error if the BeaconRegion parameters are not valid.
+ */
+function createBeacon() {
+
+    var uuid = &#39;DA5336AE-2042-453A-A57F-F80DD34DFCD9&#39;; // mandatory
+    var identifier = &#39;beaconAtTheMacBooks&#39;; // mandatory
+    var minor = 1000; // optional, defaults to wildcard if left empty
+    var major = 5; // optional, defaults to wildcard if left empty
+
+    // throws an error if the parameters are not valid
+    var beaconRegion = new cordova.plugins.locationManager.BeaconRegion(identifier, uuid, major, minor);
+
+    return beaconRegion;   
+} 
+</code></pre>
+
+<h5>Start monitoring a single iBeacon</h5>
+
+<pre><code>var logToDom = function (message) {
+    var e = document.createElement(&#39;label&#39;);
+    e.innerText = message;
+
+    var br = document.createElement(&#39;br&#39;);
+    var br2 = document.createElement(&#39;br&#39;);
+    document.body.appendChild(e);
+    document.body.appendChild(br);
+    document.body.appendChild(br2);
+
+    window.scrollTo(0, window.document.height);
+};
+
+var delegate = new cordova.plugins.locationManager.Delegate().implement({
+
+    didDetermineStateForRegion: function (pluginResult) {
+
+        logToDom(&#39;[DOM] didDetermineStateForRegion: &#39; + JSON.stringify(pluginResult));
+
+        cordova.plugins.locationManager.appendToDeviceLog(&#39;[DOM] didDetermineStateForRegion: &#39;
+            + JSON.stringify(pluginResult));
+    },
+
+    didStartMonitoringForRegion: function (pluginResult) {
+        console.log(&#39;didStartMonitoringForRegion:&#39;, pluginResult);
+
+        logToDom(&#39;didStartMonitoringForRegion:&#39; + JSON.stringify(pluginResult));
+    },
+
+    didRangeBeaconsInRegion: function (pluginResult) {
+        logToDom(&#39;[DOM] didRangeBeaconsInRegion: &#39; + JSON.stringify(pluginResult));
+    }
+
+});
+
+var uuid = &#39;DA5336AE-2042-453A-A57F-F80DD34DFCD9&#39;;
+var identifier = &#39;beaconOnTheMacBooksShelf&#39;;
+var minor = 1000;
+var major = 5;
+var beaconRegion = new cordova.plugins.locationManager.BeaconRegion(identifier, uuid, major, minor);
+
+cordova.plugins.locationManager.setDelegate(delegate);
+
+// required in iOS 8+
+cordova.plugins.locationManager.requestWhenInUseAuthorization(); 
+// or cordova.plugins.locationManager.requestAlwaysAuthorization()
+
+cordova.plugins.locationManager.startMonitoringForRegion(beaconRegion)
+    .fail(console.error)
+    .done();
+
+</code></pre>
+
+<h5>Stop monitoring a single iBeacon</h5>
+
+<pre><code>var uuid = &#39;DA5336AE-2042-453A-A57F-F80DD34DFCD9&#39;;
+var identifier = &#39;beaconOnTheMacBooksShelf&#39;;
+var minor = 1000;
+var major = 5;
+var beaconRegion = new cordova.plugins.locationManager.BeaconRegion(identifier, uuid, major, minor);
+
+cordova.plugins.locationManager.stopRangingBeaconsInRegion(beaconRegion)
+    .fail(console.error)
+    .done();
+
+</code></pre>
+
+<h5>Start ranging a single iBeacon</h5>
+
+<pre><code>var logToDom = function (message) {
+    var e = document.createElement(&#39;label&#39;);
+    e.innerText = message;
+
+    var br = document.createElement(&#39;br&#39;);
+    var br2 = document.createElement(&#39;br&#39;);
+    document.body.appendChild(e);
+    document.body.appendChild(br);
+    document.body.appendChild(br2);
+
+    window.scrollTo(0, window.document.height);
+};
+
+var delegate = new cordova.plugins.locationManager.Delegate().implement({
+
+    didDetermineStateForRegion: function (pluginResult) {
+
+        logToDom(&#39;[DOM] didDetermineStateForRegion: &#39; + JSON.stringify(pluginResult));
+
+        cordova.plugins.locationManager.appendToDeviceLog(&#39;[DOM] didDetermineStateForRegion: &#39;
+            + JSON.stringify(pluginResult));
+    },
+
+    didStartMonitoringForRegion: function (pluginResult) {
+        console.log(&#39;didStartMonitoringForRegion:&#39;, pluginResult);
+
+        logToDom(&#39;didStartMonitoringForRegion:&#39; + JSON.stringify(pluginResult));
+    },
+
+    didRangeBeaconsInRegion: function (pluginResult) {
+        logToDom(&#39;[DOM] didRangeBeaconsInRegion: &#39; + JSON.stringify(pluginResult));
+    }
+
+});
+
+var uuid = &#39;DA5336AE-2042-453A-A57F-F80DD34DFCD9&#39;;
+var identifier = &#39;beaconOnTheMacBooksShelf&#39;;
+var minor = 1000;
+var major = 5;
+var beaconRegion = new cordova.plugins.locationManager.BeaconRegion(identifier, uuid, major, minor);
+
+cordova.plugins.locationManager.setDelegate(delegate);
+
+// required in iOS 8+
+cordova.plugins.locationManager.requestWhenInUseAuthorization(); 
+// or cordova.plugins.locationManager.requestAlwaysAuthorization()
+
+cordova.plugins.locationManager.startRangingBeaconsInRegion(beaconRegion)
+    .fail(console.error)
+    .done();
+
+</code></pre>
+
+<h5>Stop ranging a single iBeacon</h5>
+
+<pre><code>var uuid = &#39;DA5336AE-2042-453A-A57F-F80DD34DFCD9&#39;;
+var identifier = &#39;beaconOnTheMacBooksShelf&#39;;
+var minor = 1000;
+var major = 5;
+var beaconRegion = new cordova.plugins.locationManager.BeaconRegion(identifier, uuid, major, minor);
+
+cordova.plugins.locationManager.stopRangingBeaconsInRegion(beaconRegion)
+    .fail(console.error)
+    .done();
+
+</code></pre>
+
+<h5>Determine if advertising is supported (iOS is supported, Android is not)</h5>
+
+<pre><code>cordova.plugins.locationManager.isAdvertisingAvailable()
+    .then(function(isSupported){
+        console.log(&quot;isSupported: &quot; + isSupported);
+    })
+    .fail(console.error)
+    .done();
+
+</code></pre>
+
+<h5>Determine if advertising is currently turned on (iOS only)</h5>
+
+<pre><code>cordova.plugins.locationManager.isAdvertising()
+    .then(function(isAdvertising){
+        console.log(&quot;isAdvertising: &quot; + isAdvertising);
+    })
+    .fail(console.error)
+    .done();
+
+</code></pre>
+
+<h5>Start advertising device as an iBeacon (iOS only)</h5>
+
+<pre><code>var uuid = &#39;DA5336AE-2042-453A-A57F-F80DD34DFCD9&#39;;
+var identifier = &#39;advertisedBeacon&#39;;
+var minor = 2000;
+var major = 5;
+var beaconRegion = new cordova.plugins.locationManager.BeaconRegion(identifier, uuid, major, minor);
+
+// The Delegate is optional
+var delegate = new cordova.plugins.locationManager.Delegate().implement({
+
+    // Event when advertising starts (there may be a short delay after the request)
+    // The property &#39;region&#39; provides details of the broadcasting Beacon
+    peripheralManagerDidStartAdvertising: function(pluginResult) {
+        console.log(&#39;peripheralManagerDidStartAdvertising: &#39;+ JSON.stringify(pluginResult.region));
+    },
+    // Event when bluetooth transmission state changes 
+    // If &#39;state&#39; is not set to BluetoothManagerStatePoweredOn when advertising cannot start
+    peripheralManagerDidUpdateState: function(pluginResult) {
+        console.log(&#39;peripheralManagerDidUpdateState: &#39;+ pluginResult.state);
+    }
+});
+cordova.plugins.locationManager.setDelegate(delegate);
+
+// Verify the platform supports transmitting as a beacon
+cordova.plugins.locationManager.isAdvertisingAvailable()
+    .then(function(isSupported){
+
+        if (isSupported) {
+            cordova.plugins.locationManager.startAdvertising(beaconRegion)
+                .fail(conole.error)
+                .done();
+        } else {
+            console.log(&quot;Advertising not supported&quot;);
+        }
+    })
+    .fail(console.error)
+    .done();
+
+</code></pre>
+
+<h5>Stopping the advertising (iOS only)</h5>
+
+<pre><code>cordova.plugins.locationManager.stopAdvertising()
+    .fail(console.error)
+    .done();
+
+</code></pre>
+
+<h2>Contributions</h2>
+
+<blockquote>
+<p>Contributions are welcome at all times, please make sure that the tests are running without errors
+before submitting a pull request. The current development branch that you should submit your pull requests against is
+<q>v3.x</q>.</p>
+</blockquote>
+
+<h3>How to execute the tests - OS X</h3>
+
+<h4>Prerequisites Of The Test Runner</h4>
+
+<ul>
+<li><a href="http://dartlang.org">Dart SDK</a> installed on the path (Tested with: 1.2, 1.3, 1.3.3)</li>
+<li><a href="http://nodejs.org/">NodeJS</a></li>
+<li><a href="https://www.npmjs.org/">NPM</a></li>
+<li><a href="https://www.npmjs.org/package/cordova">Cordova NPM package</a> (Tested with: 3.4.0-0.1.3)</li>
+<li><a href="https://developer.apple.com/xcode/">XCode</a> (Tested with 5.0.2 and 6.0)</li>
+</ul>
+
+<pre><code>dart test/run_tests.dart
+</code></pre>
+
+<p>Executing the test runner will do the following:</p>
+
+<ul>
+<li>Generates a Cordova project</li>
+<li>Add the iOS platform</li>
+<li>Installs the iBeacon plugin from the local file-system.</li>
+<li>Launches XCode by opening the project.</li>
+</ul>
+
+<h3>How to execute the tests - Without the Dart SDK</h3>
+
+<ul>
+<li>Open an app which has Cordova iBeacon plugin installed in XCode</li>
+<li>Install it onto a device or simulator</li>
+<li>Open Safari</li>
+<li>Go to the dev tools window</li>
+<li>Paste the code from the examples into the javascript console, it should run without any errors.</li>
+</ul>
+</body>
+</html>

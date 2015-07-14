@@ -1,0 +1,475 @@
+<html>
+<head>
+	<title>org.apache.cordova.camera</title>
+</head>
+<body>
+<!---
+    Licensed to the Apache Software Foundation (ASF) under one
+    or more contributor license agreements.  See the NOTICE file
+    distributed with this work for additional information
+    regarding copyright ownership.  The ASF licenses this file
+    to you under the Apache License, Version 2.0 (the
+    "License"); you may not use this file except in compliance
+    with the License.  You may obtain a copy of the License at
+
+      http://www.apache.org/licenses/LICENSE-2.0
+
+    Unless required by applicable law or agreed to in writing,
+    software distributed under the License is distributed on an
+    "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+    KIND, either express or implied.  See the License for the
+    specific language governing permissions and limitations
+    under the License.
+-->
+
+<h1>org.apache.cordova.camera</h1>
+
+<p>This plugin defines a global <code>navigator.camera</code> object, which provides an API for taking pictures and for choosing images from
+the system&#39;s image library.</p>
+
+<p>Although the object is attached to the global scoped <code>navigator</code>, it is not available until after the <code>deviceready</code> event.</p>
+
+<pre><code>document.addEventListener(&quot;deviceready&quot;, onDeviceReady, false);
+function onDeviceReady() {
+    console.log(navigator.camera);
+}
+</code></pre>
+
+<h2>Installation</h2>
+
+<pre><code>cordova plugin add org.apache.cordova.camera
+</code></pre>
+
+<h2>navigator.camera.getPicture</h2>
+
+<p>Takes a photo using the camera, or retrieves a photo from the device&#39;s
+image gallery.  The image is passed to the success callback as a
+base64-encoded <code>String</code>, or as the URI for the image file.  The method
+itself returns a <code>CameraPopoverHandle</code> object that can be used to
+reposition the file selection popover.</p>
+
+<pre><code>navigator.camera.getPicture( cameraSuccess, cameraError, cameraOptions );
+</code></pre>
+
+<h3>Description</h3>
+
+<p>The <code>camera.getPicture</code> function opens the device&#39;s default camera
+application that allows users to snap pictures. This behavior occurs
+by default, when <code>Camera.sourceType</code> equals
+<code>Camera.PictureSourceType.CAMERA</code>.  Once the user snaps the photo, the
+camera application closes and the application is restored.</p>
+
+<p>If <code>Camera.sourceType</code> is <code>Camera.PictureSourceType.PHOTOLIBRARY</code> or
+<code>Camera.PictureSourceType.SAVEDPHOTOALBUM</code>, then a dialog displays
+that allows users to select an existing image.  The
+<code>camera.getPicture</code> function returns a <code>CameraPopoverHandle</code> object,
+which can be used to reposition the image selection dialog, for
+example, when the device orientation changes.</p>
+
+<p>The return value is sent to the <code>cameraSuccess</code> callback function, in
+one of the following formats, depending on the specified
+<code>cameraOptions</code>:</p>
+
+<ul>
+<li><p>A <code>String</code> containing the base64-encoded photo image.</p></li>
+<li><p>A <code>String</code> representing the image file location on local storage (default).</p></li>
+</ul>
+
+<p>You can do whatever you want with the encoded image or URI, for
+example:</p>
+
+<ul>
+<li><p>Render the image in an <code>&lt;img&gt;</code> tag, as in the example below</p></li>
+<li><p>Save the data locally (<code>LocalStorage</code>, <a href="http://brianleroux.github.com/lawnchair/">Lawnchair</a>, etc.)</p></li>
+<li><p>Post the data to a remote server</p></li>
+</ul>
+
+<p><strong>NOTE</strong>: Photo resolution on newer devices is quite good. Photos
+selected from the device&#39;s gallery are not downscaled to a lower
+quality, even if a <code>quality</code> parameter is specified.  To avoid common
+memory problems, set <code>Camera.destinationType</code> to <code>FILE_URI</code> rather
+than <code>DATA_URL</code>.</p>
+
+<h3>Supported Platforms</h3>
+
+<ul>
+<li>Amazon Fire OS</li>
+<li>Android</li>
+<li>BlackBerry 10</li>
+<li>Browser</li>
+<li>Firefox OS</li>
+<li>iOS</li>
+<li>Tizen</li>
+<li>Windows Phone 7 and 8</li>
+<li>Windows 8</li>
+</ul>
+
+<h3>Preferences (iOS)</h3>
+
+<ul>
+<li><p><strong>CameraUsesGeolocation</strong> (boolean, defaults to false). For capturing JPEGs, set to true to get geolocation data in the EXIF header. This will trigger a request for geolocation permissions if set to true.</p>
+
+<pre><code>&lt;preference name=&quot;CameraUsesGeolocation&quot; value=&quot;false&quot; /&gt;
+</code></pre></li>
+</ul>
+
+<h3>Amazon Fire OS Quirks</h3>
+
+<p>Amazon Fire OS uses intents to launch the camera activity on the device to capture
+images, and on phones with low memory, the Cordova activity may be killed.  In this
+scenario, the image may not appear when the cordova activity is restored.</p>
+
+<h3>Android Quirks</h3>
+
+<p>Android uses intents to launch the camera activity on the device to capture
+images, and on phones with low memory, the Cordova activity may be killed.  In this
+scenario, the image may not appear when the Cordova activity is restored.</p>
+
+<h3>Browser Quirks</h3>
+
+<p>Can only return photos as base64-encoded image.</p>
+
+<h3>Firefox OS Quirks</h3>
+
+<p>Camera plugin is currently implemented using <a href="https://hacks.mozilla.org/2013/01/introducing-web-activities/">Web Activities</a>. </p>
+
+<h3>iOS Quirks</h3>
+
+<p>Including a JavaScript <code>alert()</code> in either of the callback functions
+can cause problems.  Wrap the alert within a <code>setTimeout()</code> to allow
+the iOS image picker or popover to fully close before the alert
+displays:</p>
+
+<pre><code>setTimeout(function() {
+    // do your thing here!
+}, 0);
+</code></pre>
+
+<h3>Windows Phone 7 Quirks</h3>
+
+<p>Invoking the native camera application while the device is connected
+via Zune does not work, and triggers an error callback.</p>
+
+<h3>Tizen Quirks</h3>
+
+<p>Tizen only supports a <code>destinationType</code> of
+<code>Camera.DestinationType.FILE_URI</code> and a <code>sourceType</code> of
+<code>Camera.PictureSourceType.PHOTOLIBRARY</code>.</p>
+
+<h3>Example</h3>
+
+<p>Take a photo and retrieve it as a base64-encoded image:</p>
+
+<pre><code>navigator.camera.getPicture(onSuccess, onFail, { quality: 50,
+    destinationType: Camera.DestinationType.DATA_URL
+});
+
+function onSuccess(imageData) {
+    var image = document.getElementById(&#39;myImage&#39;);
+    image.src = &quot;data:image/jpeg;base64,&quot; + imageData;
+}
+
+function onFail(message) {
+    alert(&#39;Failed because: &#39; + message);
+}
+</code></pre>
+
+<p>Take a photo and retrieve the image&#39;s file location:</p>
+
+<pre><code>navigator.camera.getPicture(onSuccess, onFail, { quality: 50,
+    destinationType: Camera.DestinationType.FILE_URI });
+
+function onSuccess(imageURI) {
+    var image = document.getElementById(&#39;myImage&#39;);
+    image.src = imageURI;
+}
+
+function onFail(message) {
+    alert(&#39;Failed because: &#39; + message);
+}
+</code></pre>
+
+<h2>CameraOptions</h2>
+
+<p>Optional parameters to customize the camera settings.</p>
+
+<pre><code>{ quality : 75,
+  destinationType : Camera.DestinationType.DATA_URL,
+  sourceType : Camera.PictureSourceType.CAMERA,
+  allowEdit : true,
+  encodingType: Camera.EncodingType.JPEG,
+  targetWidth: 100,
+  targetHeight: 100,
+  popoverOptions: CameraPopoverOptions,
+  saveToPhotoAlbum: false };
+</code></pre>
+
+<h3>Options</h3>
+
+<ul>
+<li><p><strong>quality</strong>: Quality of the saved image, expressed as a range of 0-100, where 100 is typically full resolution with no loss from file compression. The default is 50. <u>(Number)</u> (Note that information about the camera&#39;s resolution is unavailable.)</p></li>
+<li><p><strong>destinationType</strong>: Choose the format of the return value. The default is FILE_URI. Defined in <code>navigator.camera.DestinationType</code> <u>(Number)</u></p>
+
+<pre><code>Camera.DestinationType = {
+    DATA_URL : 0,      // Return image as base64-encoded string
+    FILE_URI : 1,      // Return image file URI
+    NATIVE_URI : 2     // Return image native URI (e.g., assets-library:// on iOS or content:// on Android)
+};
+</code></pre></li>
+<li><p><strong>sourceType</strong>: Set the source of the picture. The default is CAMERA. Defined in <code>navigator.camera.PictureSourceType</code> <u>(Number)</u></p>
+
+<pre><code>Camera.PictureSourceType = {
+    PHOTOLIBRARY : 0,
+    CAMERA : 1,
+    SAVEDPHOTOALBUM : 2
+};
+</code></pre></li>
+<li><p><strong>allowEdit</strong>: Allow simple editing of image before selection. <u>(Boolean)</u></p></li>
+<li><p><strong>encodingType</strong>: Choose the  returned image file&#39;s encoding. Default is JPEG. Defined in <code>navigator.camera.EncodingType</code> <u>(Number)</u></p>
+
+<pre><code>Camera.EncodingType = {
+    JPEG : 0,               // Return JPEG encoded image
+    PNG : 1                 // Return PNG encoded image
+};
+</code></pre></li>
+<li><p><strong>targetWidth</strong>: Width in pixels to scale image. Must be used with <strong>targetHeight</strong>.  Aspect ratio remains constant. <u>(Number)</u></p></li>
+<li><p><strong>targetHeight</strong>: Height in pixels to scale image. Must be used with <strong>targetWidth</strong>. Aspect ratio remains constant. <u>(Number)</u></p></li>
+<li><p><strong>mediaType</strong>: Set the type of media to select from.  Only works when <code>PictureSourceType</code> is <code>PHOTOLIBRARY</code> or <code>SAVEDPHOTOALBUM</code>. Defined in <code>nagivator.camera.MediaType</code> <u>(Number)</u></p>
+
+<pre><code>Camera.MediaType = {
+    PICTURE: 0,    // allow selection of still pictures only. DEFAULT. Will return format specified via DestinationType
+    VIDEO: 1,      // allow selection of video only, WILL ALWAYS RETURN FILE_URI
+    ALLMEDIA : 2   // allow selection from all media types
+};
+</code></pre></li>
+<li><p><strong>correctOrientation</strong>: Rotate the image to correct for the orientation of the device during capture. <u>(Boolean)</u></p></li>
+<li><p><strong>saveToPhotoAlbum</strong>: Save the image to the photo album on the device after capture. <u>(Boolean)</u></p></li>
+<li><p><strong>popoverOptions</strong>: iOS-only options that specify popover location in iPad.  Defined in <code>CameraPopoverOptions</code>.</p></li>
+<li><p><strong>cameraDirection</strong>: Choose the camera to use (front- or back-facing). The default is BACK. Defined in <code>navigator.camera.Direction</code> <u>(Number)</u></p>
+
+<pre><code>Camera.Direction = {
+    BACK : 0,      // Use the back-facing camera
+    FRONT : 1      // Use the front-facing camera
+};
+</code></pre></li>
+</ul>
+
+<h3>Amazon Fire OS Quirks</h3>
+
+<ul>
+<li><p>Any <code>cameraDirection</code> value results in a back-facing photo.</p></li>
+<li><p>Ignores the <code>allowEdit</code> parameter.</p></li>
+<li><p><code>Camera.PictureSourceType.PHOTOLIBRARY</code> and <code>Camera.PictureSourceType.SAVEDPHOTOALBUM</code> both display the same photo album.</p></li>
+</ul>
+
+<h3>Android Quirks</h3>
+
+<ul>
+<li><p>Any <code>cameraDirection</code> value results in a back-facing photo.</p></li>
+<li><p>Ignores the <code>allowEdit</code> parameter.</p></li>
+<li><p><code>Camera.PictureSourceType.PHOTOLIBRARY</code> and <code>Camera.PictureSourceType.SAVEDPHOTOALBUM</code> both display the same photo album.</p></li>
+</ul>
+
+<h3>BlackBerry 10 Quirks</h3>
+
+<ul>
+<li><p>Ignores the <code>quality</code> parameter.</p></li>
+<li><p>Ignores the <code>allowEdit</code> parameter.</p></li>
+<li><p><code>Camera.MediaType</code> is not supported.</p></li>
+<li><p>Ignores the <code>correctOrientation</code> parameter.</p></li>
+<li><p>Ignores the <code>cameraDirection</code> parameter.</p></li>
+</ul>
+
+<h3>Firefox OS Quirks</h3>
+
+<ul>
+<li><p>Ignores the <code>quality</code> parameter.</p></li>
+<li><p><code>Camera.DestinationType</code> is ignored and equals <code>1</code> (image file URI)</p></li>
+<li><p>Ignores the <code>allowEdit</code> parameter.</p></li>
+<li><p>Ignores the <code>PictureSourceType</code> parameter (user chooses it in a dialog window)</p></li>
+<li><p>Ignores the <code>encodingType</code></p></li>
+<li><p>Ignores the <code>targetWidth</code> and <code>targetHeight</code></p></li>
+<li><p><code>Camera.MediaType</code> is not supported.</p></li>
+<li><p>Ignores the <code>correctOrientation</code> parameter.</p></li>
+<li><p>Ignores the <code>cameraDirection</code> parameter.</p></li>
+</ul>
+
+<h3>iOS Quirks</h3>
+
+<ul>
+<li><p>Set <code>quality</code> below 50 to avoid memory errors on some devices.</p></li>
+<li><p>When using <code>destinationType.FILE_URI</code>, photos are saved in the application&#39;s temporary directory. The contents of the application&#39;s temporary directory is deleted when the application ends.</p></li>
+</ul>
+
+<h3>Tizen Quirks</h3>
+
+<ul>
+<li><p>options not supported</p></li>
+<li><p>always returns a FILE URI</p></li>
+</ul>
+
+<h3>Windows Phone 7 and 8 Quirks</h3>
+
+<ul>
+<li><p>Ignores the <code>allowEdit</code> parameter.</p></li>
+<li><p>Ignores the <code>correctOrientation</code> parameter.</p></li>
+<li><p>Ignores the <code>cameraDirection</code> parameter.</p></li>
+<li><p>Ignores the <code>saveToPhotoAlbum</code> parameter.  IMPORTANT: All images taken with the wp7/8 cordova camera API are always copied to the phone&#39;s camera roll.  Depending on the user&#39;s settings, this could also mean the image is auto-uploaded to their OneDrive.  This could potentially mean the image is available to a wider audience than your app intended.  If this a blocker for your application, you will need to implement the CameraCaptureTask as documented on msdn : <a href="http://msdn.microsoft.com/en-us/library/windowsphone/develop/hh394006.aspx">http://msdn.microsoft.com/en-us/library/windowsphone/develop/hh394006.aspx</a>
+You may also comment or up-vote the related issue in the <a href="https://issues.apache.org/jira/browse/CB-2083">issue tracker</a></p></li>
+<li><p>Ignores the <code>mediaType</code> property of <code>cameraOptions</code> as the Windows Phone SDK does not provide a way to choose videos from PHOTOLIBRARY.</p></li>
+</ul>
+
+<h2>CameraError</h2>
+
+<p>onError callback function that provides an error message.</p>
+
+<pre><code>function(message) {
+    // Show a helpful message
+}
+</code></pre>
+
+<h3>Parameters</h3>
+
+<ul>
+<li><strong>message</strong>: The message is provided by the device&#39;s native code. <u>(String)</u></li>
+</ul>
+
+<h2>cameraSuccess</h2>
+
+<p>onSuccess callback function that provides the image data.</p>
+
+<pre><code>function(imageData) {
+    // Do something with the image
+}
+</code></pre>
+
+<h3>Parameters</h3>
+
+<ul>
+<li><strong>imageData</strong>: Base64 encoding of the image data, <u>or</u> the image file URI, depending on <code>cameraOptions</code> in effect. <u>(String)</u></li>
+</ul>
+
+<h3>Example</h3>
+
+<pre><code>// Show image
+//
+function cameraCallback(imageData) {
+    var image = document.getElementById(&#39;myImage&#39;);
+    image.src = &quot;data:image/jpeg;base64,&quot; + imageData;
+}
+</code></pre>
+
+<h2>CameraPopoverHandle</h2>
+
+<p>A handle to the popover dialog created by <code>navigator.camera.getPicture</code>.</p>
+
+<h3>Methods</h3>
+
+<ul>
+<li><strong>setPosition</strong>: Set the position of the popover.</li>
+</ul>
+
+<h3>Supported Platforms</h3>
+
+<ul>
+<li>iOS</li>
+</ul>
+
+<h3>setPosition</h3>
+
+<p>Set the position of the popover.</p>
+
+<p><strong>Parameters</strong>:</p>
+
+<ul>
+<li><code>cameraPopoverOptions</code>: the <code>CameraPopoverOptions</code> that specify the new position</li>
+</ul>
+
+<h3>Example</h3>
+
+<pre><code> var cameraPopoverHandle = navigator.camera.getPicture(onSuccess, onFail,
+     { destinationType: Camera.DestinationType.FILE_URI,
+       sourceType: Camera.PictureSourceType.PHOTOLIBRARY,
+       popoverOptions: new CameraPopoverOptions(300, 300, 100, 100, Camera.PopoverArrowDirection.ARROW_ANY)
+     });
+
+ // Reposition the popover if the orientation changes.
+ window.onorientationchange = function() {
+     var cameraPopoverOptions = new CameraPopoverOptions(0, 0, 100, 100, Camera.PopoverArrowDirection.ARROW_ANY);
+     cameraPopoverHandle.setPosition(cameraPopoverOptions);
+ }
+</code></pre>
+
+<h2>CameraPopoverOptions</h2>
+
+<p>iOS-only parameters that specify the anchor element location and arrow
+direction of the popover when selecting images from an iPad&#39;s library
+or album.</p>
+
+<pre><code>{ x : 0,
+  y :  32,
+  width : 320,
+  height : 480,
+  arrowDir : Camera.PopoverArrowDirection.ARROW_ANY
+};
+</code></pre>
+
+<h3>CameraPopoverOptions</h3>
+
+<ul>
+<li><p><strong>x</strong>: x pixel coordinate of screen element onto which to anchor the popover. <u>(Number)</u></p></li>
+<li><p><strong>y</strong>: y pixel coordinate of screen element onto which to anchor the popover. <u>(Number)</u></p></li>
+<li><p><strong>width</strong>: width, in pixels, of the screen element onto which to anchor the popover. <u>(Number)</u></p></li>
+<li><p><strong>height</strong>: height, in pixels, of the screen element onto which to anchor the popover. <u>(Number)</u></p></li>
+<li><p><strong>arrowDir</strong>: Direction the arrow on the popover should point.  Defined in <code>Camera.PopoverArrowDirection</code> <u>(Number)</u></p>
+
+<pre><code>    Camera.PopoverArrowDirection = {
+        ARROW_UP : 1,        // matches iOS UIPopoverArrowDirection constants
+        ARROW_DOWN : 2,
+        ARROW_LEFT : 4,
+        ARROW_RIGHT : 8,
+        ARROW_ANY : 15
+    };
+</code></pre></li>
+</ul>
+
+<p>Note that the size of the popover may change to adjust to the
+direction of the arrow and orientation of the screen.  Make sure to
+account for orientation changes when specifying the anchor element
+location.</p>
+
+<h2>navigator.camera.cleanup</h2>
+
+<p>Removes intermediate photos taken by the camera from temporary
+storage.</p>
+
+<pre><code>navigator.camera.cleanup( cameraSuccess, cameraError );
+</code></pre>
+
+<h3>Description</h3>
+
+<p>Removes intermediate image files that are kept in temporary storage
+after calling <code>camera.getPicture</code>. Applies only when the value of
+<code>Camera.sourceType</code> equals <code>Camera.PictureSourceType.CAMERA</code> and the
+<code>Camera.destinationType</code> equals <code>Camera.DestinationType.FILE_URI</code>.</p>
+
+<h3>Supported Platforms</h3>
+
+<ul>
+<li>iOS</li>
+</ul>
+
+<h3>Example</h3>
+
+<pre><code>navigator.camera.cleanup(onSuccess, onFail);
+
+function onSuccess() {
+    console.log(&quot;Camera cleanup success.&quot;)
+}
+
+function onFail(message) {
+    alert(&#39;Failed because: &#39; + message);
+}
+</code></pre>
+</body>
+</html>

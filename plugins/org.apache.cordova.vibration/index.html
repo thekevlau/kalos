@@ -1,0 +1,217 @@
+<html>
+<head>
+	<title>org.apache.cordova.vibration</title>
+</head>
+<body>
+<!---
+    Licensed to the Apache Software Foundation (ASF) under one
+    or more contributor license agreements.  See the NOTICE file
+    distributed with this work for additional information
+    regarding copyright ownership.  The ASF licenses this file
+    to you under the Apache License, Version 2.0 (the
+    "License"); you may not use this file except in compliance
+    with the License.  You may obtain a copy of the License at
+
+      http://www.apache.org/licenses/LICENSE-2.0
+
+    Unless required by applicable law or agreed to in writing,
+    software distributed under the License is distributed on an
+    "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+    KIND, either express or implied.  See the License for the
+    specific language governing permissions and limitations
+    under the License.
+-->
+
+<h1>org.apache.cordova.vibration</h1>
+
+<p>This plugin aligns with the W3C vibration specification <a href="http://www.w3.org/TR/vibration/">http://www.w3.org/TR/vibration/</a></p>
+
+<p>This plugin provides a way to vibrate the device.</p>
+
+<p>This plugin defines global objects including <code>navigator.vibrate</code>.</p>
+
+<p>Although in the global scope, they are not available until after the <code>deviceready</code> event.</p>
+
+<pre><code>document.addEventListener(&quot;deviceready&quot;, onDeviceReady, false);
+function onDeviceReady() {
+    console.log(navigator.vibrate);
+}
+</code></pre>
+
+<h2>Installation</h2>
+
+<pre><code>cordova plugin add org.apache.cordova.vibration
+</code></pre>
+
+<h2>Supported Platforms</h2>
+
+<p>navigator.vibrate,<br />
+navigator.notification.vibrate</p>
+
+<ul>
+<li>Amazon Fire OS</li>
+<li>Android</li>
+<li>BlackBerry 10</li>
+<li>Firefox OS</li>
+<li>iOS</li>
+<li>Windows Phone 7 and 8</li>
+</ul>
+
+<p>navigator.notification.vibrateWithPattern,<br />navigator.notification.cancelVibration</p>
+
+<ul>
+<li>Android</li>
+<li>Windows Phone 8</li>
+</ul>
+
+<h2>vibrate (recommended)</h2>
+
+<p>This function has three different functionalities based on parameters passed to it.</p>
+
+<p>###Standard vibrate</p>
+
+<p>Vibrates the device for a given amount of time.</p>
+
+<pre><code>navigator.vibrate(time)
+</code></pre>
+
+<p>or</p>
+
+<pre><code>navigator.vibrate([time])
+</code></pre>
+
+<p>-<strong>time</strong>: Milliseconds to vibrate the device. <u>(Number)</u></p>
+
+<p>####Example</p>
+
+<pre><code>// Vibrate for 3 seconds
+navigator.vibrate(3000);
+
+// Vibrate for 3 seconds
+navigator.vibrate([3000]);
+</code></pre>
+
+<p>####iOS Quirks</p>
+
+<ul>
+<li><p><strong>time</strong>: Ignores the specified time and vibrates for a pre-set amount of time.</p>
+
+<p>navigator.vibrate(3000); // 3000 is ignored</p></li>
+</ul>
+
+<p>####Windows and Blackberry Quirks</p>
+
+<ul>
+<li><p><strong>time</strong>: Max time is 5000ms (5s) and min time is 1ms</p>
+
+<p>navigator.vibrate(8000); // will be truncated to 5000</p></li>
+</ul>
+
+<p>###Vibrate with a pattern (Android and Windows only)
+Vibrates the device with a given pattern</p>
+
+<pre><code>navigator.vibrate(pattern);   
+</code></pre>
+
+<ul>
+<li><strong>pattern</strong>: Sequence of durations (in milliseconds) for which to turn on or off the vibrator. <u>(Array of Numbers)</u></li>
+</ul>
+
+<p>####Example</p>
+
+<pre><code>// Vibrate for 1 second
+// Wait for 1 second
+// Vibrate for 3 seconds
+// Wait for 1 second
+// Vibrate for 5 seconds
+navigator.vibrate([1000, 1000, 3000, 1000, 5000]);
+</code></pre>
+
+<p>####Windows Phone 8 Quirks</p>
+
+<ul>
+<li>vibrate(pattern) falls back on vibrate with default duration</li>
+</ul>
+
+<p>###Cancel vibration (not supported in iOS)</p>
+
+<p>Immediately cancels any currently running vibration.</p>
+
+<pre><code>navigator.vibrate(0)
+</code></pre>
+
+<p>or</p>
+
+<pre><code>navigator.vibrate([])
+</code></pre>
+
+<p>or</p>
+
+<pre><code>navigator.vibrate([0])
+</code></pre>
+
+<p>Passing in a parameter of 0, an empty array, or an array with one element of value 0 will cancel any vibrations.</p>
+
+<h2>*notification.vibrate (deprecated)</h2>
+
+<p>Vibrates the device for a given amount of time.</p>
+
+<pre><code>navigator.notification.vibrate(time)
+</code></pre>
+
+<ul>
+<li><strong>time</strong>: Milliseconds to vibrate the device. <u>(Number)</u></li>
+</ul>
+
+<h3>Example</h3>
+
+<pre><code>// Vibrate for 2.5 seconds
+navigator.notification.vibrate(2500);
+</code></pre>
+
+<h3>iOS Quirks</h3>
+
+<ul>
+<li><p><strong>time</strong>: Ignores the specified time and vibrates for a pre-set amount of time.</p>
+
+<pre><code>navigator.notification.vibrate();
+navigator.notification.vibrate(2500);   // 2500 is ignored
+</code></pre></li>
+</ul>
+
+<h2>*notification.vibrateWithPattern (deprecated)</h2>
+
+<p>Vibrates the device with a given pattern.</p>
+
+<pre><code>navigator.notification.vibrateWithPattern(pattern, repeat)
+</code></pre>
+
+<ul>
+<li><strong>pattern</strong>: Sequence of durations (in milliseconds) for which to turn on or off the vibrator. <u>(Array of Numbers)</u></li>
+<li><strong>repeat</strong>: Optional index into the pattern array at which to start repeating (will repeat until canceled), or -1 for no repetition (default). <u>(Number)</u></li>
+</ul>
+
+<h3>Example</h3>
+
+<pre><code>// Immediately start vibrating
+// vibrate for 100ms,
+// wait for 100ms,
+// vibrate for 200ms,
+// wait for 100ms,
+// vibrate for 400ms,
+// wait for 100ms,
+// vibrate for 800ms,
+// (do not repeat)
+navigator.notification.vibrateWithPattern([0, 100, 100, 200, 100, 400, 100, 800]);
+</code></pre>
+
+<h2>*notification.cancelVibration (deprecated)</h2>
+
+<p>Immediately cancels any currently running vibration.</p>
+
+<pre><code>navigator.notification.cancelVibration()
+</code></pre>
+
+<p>*Note - due to alignment with w3c spec, the starred methods will be phased out</p>
+</body>
+</html>

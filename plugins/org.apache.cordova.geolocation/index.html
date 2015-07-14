@@ -1,0 +1,313 @@
+<html>
+<head>
+	<title>org.apache.cordova.geolocation</title>
+</head>
+<body>
+<!---
+    Licensed to the Apache Software Foundation (ASF) under one
+    or more contributor license agreements.  See the NOTICE file
+    distributed with this work for additional information
+    regarding copyright ownership.  The ASF licenses this file
+    to you under the Apache License, Version 2.0 (the
+    "License"); you may not use this file except in compliance
+    with the License.  You may obtain a copy of the License at
+
+      http://www.apache.org/licenses/LICENSE-2.0
+
+    Unless required by applicable law or agreed to in writing,
+    software distributed under the License is distributed on an
+    "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+    KIND, either express or implied.  See the License for the
+    specific language governing permissions and limitations
+    under the License.
+-->
+
+<h1>org.apache.cordova.geolocation</h1>
+
+<p>This plugin provides information about the device&#39;s location, such as
+latitude and longitude. Common sources of location information include
+Global Positioning System (GPS) and location inferred from network
+signals such as IP address, RFID, WiFi and Bluetooth MAC addresses,
+and GSM/CDMA cell IDs. There is no guarantee that the API returns the
+device&#39;s actual location.</p>
+
+<p>This API is based on the
+<a href="http://dev.w3.org/geo/api/spec-source.html">W3C Geolocation API Specification</a>,
+and only executes on devices that don&#39;t already provide an implementation.</p>
+
+<p><strong>WARNING</strong>: Collection and use of geolocation data
+raises important privacy issues.  Your app&#39;s privacy policy should
+discuss how the app uses geolocation data, whether it is shared with
+any other parties, and the level of precision of the data (for
+example, coarse, fine, ZIP code level, etc.).  Geolocation data is
+generally considered sensitive because it can reveal user&#39;s
+whereabouts and, if stored, the history of their travels.
+Therefore, in addition to the app&#39;s privacy policy, you should
+strongly consider providing a just-in-time notice before the app
+accesses geolocation data (if the device operating system doesn&#39;t do
+so already).  That notice should provide the same information noted
+above, as well as obtaining the user&#39;s permission (e.g., by presenting
+choices for <strong>OK</strong> and <strong>No Thanks</strong>).  For more information, please
+see the Privacy Guide.</p>
+
+<p>This plugin defines a global <code>navigator.geolocation</code> object (for platforms
+where it is otherwise missing).</p>
+
+<p>Although the object is in the global scope, features provided by this plugin
+are not available until after the <code>deviceready</code> event.</p>
+
+<pre><code>document.addEventListener(&quot;deviceready&quot;, onDeviceReady, false);
+function onDeviceReady() {
+    console.log(&quot;navigator.geolocation works well&quot;);
+}
+</code></pre>
+
+<h2>Installation</h2>
+
+<pre><code>cordova plugin add org.apache.cordova.geolocation
+</code></pre>
+
+<h2>Supported Platforms</h2>
+
+<ul>
+<li>Amazon Fire OS</li>
+<li>Android</li>
+<li>BlackBerry 10</li>
+<li>Firefox OS</li>
+<li>iOS</li>
+<li>Tizen</li>
+<li>Windows Phone 7 and 8</li>
+<li>Windows 8</li>
+</ul>
+
+<h2>Methods</h2>
+
+<ul>
+<li>navigator.geolocation.getCurrentPosition</li>
+<li>navigator.geolocation.watchPosition</li>
+<li>navigator.geolocation.clearWatch</li>
+</ul>
+
+<h2>Objects (Read-Only)</h2>
+
+<ul>
+<li>Position</li>
+<li>PositionError</li>
+<li>Coordinates</li>
+</ul>
+
+<h2>navigator.geolocation.getCurrentPosition</h2>
+
+<p>Returns the device&#39;s current position to the <code>geolocationSuccess</code>
+callback with a <code>Position</code> object as the parameter.  If there is an
+error, the <code>geolocationError</code> callback is passed a
+<code>PositionError</code> object.</p>
+
+<pre><code>navigator.geolocation.getCurrentPosition(geolocationSuccess,
+                                         [geolocationError],
+                                         [geolocationOptions]);
+</code></pre>
+
+<h3>Parameters</h3>
+
+<ul>
+<li><p><strong>geolocationSuccess</strong>: The callback that is passed the current position.</p></li>
+<li><p><strong>geolocationError</strong>: <u>(Optional)</u> The callback that executes if an error occurs.</p></li>
+<li><p><strong>geolocationOptions</strong>: <u>(Optional)</u> The geolocation options.</p></li>
+</ul>
+
+<h3>Example</h3>
+
+<pre><code>// onSuccess Callback
+// This method accepts a Position object, which contains the
+// current GPS coordinates
+//
+var onSuccess = function(position) {
+    alert(&#39;Latitude: &#39;          + position.coords.latitude          + &#39;\n&#39; +
+          &#39;Longitude: &#39;         + position.coords.longitude         + &#39;\n&#39; +
+          &#39;Altitude: &#39;          + position.coords.altitude          + &#39;\n&#39; +
+          &#39;Accuracy: &#39;          + position.coords.accuracy          + &#39;\n&#39; +
+          &#39;Altitude Accuracy: &#39; + position.coords.altitudeAccuracy  + &#39;\n&#39; +
+          &#39;Heading: &#39;           + position.coords.heading           + &#39;\n&#39; +
+          &#39;Speed: &#39;             + position.coords.speed             + &#39;\n&#39; +
+          &#39;Timestamp: &#39;         + position.timestamp                + &#39;\n&#39;);
+};
+
+// onError Callback receives a PositionError object
+//
+function onError(error) {
+    alert(&#39;code: &#39;    + error.code    + &#39;\n&#39; +
+          &#39;message: &#39; + error.message + &#39;\n&#39;);
+}
+
+navigator.geolocation.getCurrentPosition(onSuccess, onError);
+</code></pre>
+
+<h2>navigator.geolocation.watchPosition</h2>
+
+<p>Returns the device&#39;s current position when a change in position is detected.
+When the device retrieves a new location, the <code>geolocationSuccess</code>
+callback executes with a <code>Position</code> object as the parameter.  If
+there is an error, the <code>geolocationError</code> callback executes with a
+<code>PositionError</code> object as the parameter.</p>
+
+<pre><code>var watchId = navigator.geolocation.watchPosition(geolocationSuccess,
+                                                  [geolocationError],
+                                                  [geolocationOptions]);
+</code></pre>
+
+<h3>Parameters</h3>
+
+<ul>
+<li><p><strong>geolocationSuccess</strong>: The callback that is passed the current position.</p></li>
+<li><p><strong>geolocationError</strong>: (Optional) The callback that executes if an error occurs.</p></li>
+<li><p><strong>geolocationOptions</strong>: (Optional) The geolocation options.</p></li>
+</ul>
+
+<h3>Returns</h3>
+
+<ul>
+<li><strong>String</strong>: returns a watch id that references the watch position interval. The watch id should be used with <code>navigator.geolocation.clearWatch</code> to stop watching for changes in position.</li>
+</ul>
+
+<h3>Example</h3>
+
+<pre><code>// onSuccess Callback
+//   This method accepts a `Position` object, which contains
+//   the current GPS coordinates
+//
+function onSuccess(position) {
+    var element = document.getElementById(&#39;geolocation&#39;);
+    element.innerHTML = &#39;Latitude: &#39;  + position.coords.latitude      + &#39;&lt;br /&gt;&#39; +
+                        &#39;Longitude: &#39; + position.coords.longitude     + &#39;&lt;br /&gt;&#39; +
+                        &#39;&lt;hr /&gt;&#39;      + element.innerHTML;
+}
+
+// onError Callback receives a PositionError object
+//
+function onError(error) {
+    alert(&#39;code: &#39;    + error.code    + &#39;\n&#39; +
+          &#39;message: &#39; + error.message + &#39;\n&#39;);
+}
+
+// Options: throw an error if no update is received every 30 seconds.
+//
+var watchID = navigator.geolocation.watchPosition(onSuccess, onError, { timeout: 30000 });
+</code></pre>
+
+<h2>geolocationOptions</h2>
+
+<p>Optional parameters to customize the retrieval of the geolocation
+<code>Position</code>.</p>
+
+<pre><code>{ maximumAge: 3000, timeout: 5000, enableHighAccuracy: true };
+</code></pre>
+
+<h3>Options</h3>
+
+<ul>
+<li><p><strong>enableHighAccuracy</strong>: Provides a hint that the application needs the best possible results. By default, the device attempts to retrieve a <code>Position</code> using network-based methods. Setting this property to <code>true</code> tells the framework to use more accurate methods, such as satellite positioning. <u>(Boolean)</u></p></li>
+<li><p><strong>timeout</strong>: The maximum length of time (milliseconds) that is allowed to pass from the call to <code>navigator.geolocation.getCurrentPosition</code> or <code>geolocation.watchPosition</code> until the corresponding <code>geolocationSuccess</code> callback executes. If the <code>geolocationSuccess</code> callback is not invoked within this time, the <code>geolocationError</code> callback is passed a <code>PositionError.TIMEOUT</code> error code. (Note that when used in conjunction with <code>geolocation.watchPosition</code>, the <code>geolocationError</code> callback could be called on an interval every <code>timeout</code> milliseconds!) <u>(Number)</u></p></li>
+<li><p><strong>maximumAge</strong>: Accept a cached position whose age is no greater than the specified time in milliseconds. <u>(Number)</u></p></li>
+</ul>
+
+<h3>Android Quirks</h3>
+
+<p>Android 2.x emulators do not return a geolocation result unless the <code>enableHighAccuracy</code> option is set to <code>true</code>.</p>
+
+<h2>navigator.geolocation.clearWatch</h2>
+
+<p>Stop watching for changes to the device&#39;s location referenced by the
+<code>watchID</code> parameter.</p>
+
+<pre><code>navigator.geolocation.clearWatch(watchID);
+</code></pre>
+
+<h3>Parameters</h3>
+
+<ul>
+<li><strong>watchID</strong>: The id of the <code>watchPosition</code> interval to clear. (String)</li>
+</ul>
+
+<h3>Example</h3>
+
+<pre><code>// Options: watch for changes in position, and use the most
+// accurate position acquisition method available.
+//
+var watchID = navigator.geolocation.watchPosition(onSuccess, onError, { enableHighAccuracy: true });
+
+// ...later on...
+
+navigator.geolocation.clearWatch(watchID);
+</code></pre>
+
+<h2>Position</h2>
+
+<p>Contains <code>Position</code> coordinates and timestamp, created by the geolocation API.</p>
+
+<h3>Properties</h3>
+
+<ul>
+<li><p><strong>coords</strong>: A set of geographic coordinates. <u>(Coordinates)</u></p></li>
+<li><p><strong>timestamp</strong>: Creation timestamp for <code>coords</code>. <u>(Date)</u></p></li>
+</ul>
+
+<h2>Coordinates</h2>
+
+<p>A <code>Coordinates</code> object is attached to a <code>Position</code> object that is
+available to callback functions in requests for the current position.
+It contains a set of properties that describe the geographic coordinates of a position.</p>
+
+<h3>Properties</h3>
+
+<ul>
+<li><p><strong>latitude</strong>: Latitude in decimal degrees. <u>(Number)</u></p></li>
+<li><p><strong>longitude</strong>: Longitude in decimal degrees. <u>(Number)</u></p></li>
+<li><p><strong>altitude</strong>: Height of the position in meters above the ellipsoid. <u>(Number)</u></p></li>
+<li><p><strong>accuracy</strong>: Accuracy level of the latitude and longitude coordinates in meters. <u>(Number)</u></p></li>
+<li><p><strong>altitudeAccuracy</strong>: Accuracy level of the altitude coordinate in meters. <u>(Number)</u></p></li>
+<li><p><strong>heading</strong>: Direction of travel, specified in degrees counting clockwise relative to the true north. <u>(Number)</u></p></li>
+<li><p><strong>speed</strong>: Current ground speed of the device, specified in meters per second. <u>(Number)</u></p></li>
+</ul>
+
+<h3>Amazon Fire OS Quirks</h3>
+
+<p><strong>altitudeAccuracy</strong>: Not supported by Android devices, returning <code>null</code>.</p>
+
+<h3>Android Quirks</h3>
+
+<p><strong>altitudeAccuracy</strong>: Not supported by Android devices, returning <code>null</code>.</p>
+
+<h2>PositionError</h2>
+
+<p>The <code>PositionError</code> object is passed to the <code>geolocationError</code>
+callback function when an error occurs with navigator.geolocation.</p>
+
+<h3>Properties</h3>
+
+<ul>
+<li><p><strong>code</strong>: One of the predefined error codes listed below.</p></li>
+<li><p><strong>message</strong>: Error message describing the details of the error encountered.</p></li>
+</ul>
+
+<h3>Constants</h3>
+
+<ul>
+<li><code>PositionError.PERMISSION_DENIED</code>
+
+<ul>
+<li>Returned when users do not allow the app to retrieve position information. This is dependent on the platform.</li>
+</ul></li>
+<li><code>PositionError.POSITION_UNAVAILABLE</code>
+
+<ul>
+<li>Returned when the device is unable to retrieve a position. In general, this means the device is not connected to a network or can&#39;t get a satellite fix.</li>
+</ul></li>
+<li><code>PositionError.TIMEOUT</code>
+
+<ul>
+<li>Returned when the device is unable to retrieve a position within the time specified by the <code>timeout</code> included in <code>geolocationOptions</code>. When used with <code>navigator.geolocation.watchPosition</code>, this error could be repeatedly passed to the <code>geolocationError</code> callback every <code>timeout</code> milliseconds.</li>
+</ul></li>
+</ul>
+</body>
+</html>
