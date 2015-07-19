@@ -49,7 +49,7 @@ Demonstration of the TI SensorTag accelerometer.
 	<h1>Kalos</h1>
 	<h2>The Next Generation IOT Fitness Companion</h2>
 
-	<img src="TISensorTagCC2650.png"
+	<img src="weightLift.jpg"
 		style="float:right;width:120px;height:auto;"/>
 
 	<p>
@@ -63,13 +63,15 @@ Demonstration of the TI SensorTag accelerometer.
 		<span class="color_softred">Please upgrade the firmware of your SensorTag.</span>
 	</p>
 
-	<button onclick="connect()" class="green">
+	<button onclick="startWorkout()" class="green">
 		Start Workout
 	</button>
 
-	<button onclick="disconnect()" class="charcoal">
+	<button onclick="endWorkout()" class="red">
 		End Workout
 	</button>
+
+	<p><strong>Rep Count:</strong> <span id="repcount">0</span></p>
 
 	<p><strong>Status:</strong> <span id="status">Ready</span></p>
 
@@ -80,12 +82,14 @@ Demonstration of the TI SensorTag accelerometer.
 	<script src="libs/evothings/tisensortag/tisensortag.js"></script>
 	<script src="SpriteManager.js"></script>
 	<script src="libs/util/sql.js"></script>
+	<script src="libs/jquery/jquery.js"></script>
 
 	<script>
 	// Globals.
 	var sprite
 	var sensortag
 	var repcount_db
+	var repCount = 0
 
 	function initialise()
 	{
@@ -147,16 +151,17 @@ Demonstration of the TI SensorTag accelerometer.
 			.gyroscopeCallback(gyroscopeHandler, 100)
 	}
 
-	function connect()
+	function startWorkout()
 	{
 		sensortag.connectToNearestDevice()
 	}
 
-	function disconnect()
+	function endWorkout()
 	{
 		sensortag.disconnectDevice()
 		displayStatus('Disconnected')
 		sprite.hide()
+		repCount = 0
 	}
 
 	function statusHandler(status)
@@ -165,6 +170,8 @@ Demonstration of the TI SensorTag accelerometer.
 
 		if (evothings.tisensortag.ble.status.SENSORTAG_ONLINE == status)
 		{
+			status = "Work Out!"
+			displayStatus(status)
 			displaySprite()
 		}
 	}
@@ -239,6 +246,7 @@ Demonstration of the TI SensorTag accelerometer.
 
 		interpretAccelerometerData (dx, dy, dz)
 		logAccelerometerData(dx, dy, dz)
+		repCounter(dz)
 	}
 
 	function interpretAccelerometerData(dx, dy, dz)
@@ -279,22 +287,24 @@ Demonstration of the TI SensorTag accelerometer.
 	}
 
 
-// Function for Rep Counter
+// Function for Rep Counter 
+// Need to find out for what z-values I count a rep
 
-	// function repCounter(dz)
-	// {
-	// 	var repCount = 0
-	// 	if (dz == 0)
-	// 	{
-	// 		repCount++
-	// 	}
-	// 	else
-	// 	{
-	// 		repCount
-	// 	}
+	function repCounter(dz)
+	{
 
-	// 	return repCount
-	// }
+		if (dz < 0)
+		{
+			repCount++ 
+			displayRepCount(repCount)
+		}
+		
+	}
+
+	function displayRepCount(Count)
+	{
+		document.getElementById('repcount').innerHTML = Count
+	}
 
 	function displayStatus(status)
 	{
