@@ -100,6 +100,7 @@ Demonstration of the TI SensorTag accelerometer.
 		sprite.setDOMElement(document.getElementById('sprite'))
 	}
 
+	// TODO: make sure the db instance works
 	function initialiseRepCountDatabase()
 	{
 		var sql = window.SQL
@@ -143,6 +144,7 @@ Demonstration of the TI SensorTag accelerometer.
 			.statusCallback(statusHandler)
 			.errorCallback(errorHandler)
 			.accelerometerCallback(accelerometerHandler, 100)
+			.gyroscopeCallback(gyroscopeHandler, 100)
 	}
 
 	function connect()
@@ -180,6 +182,48 @@ Demonstration of the TI SensorTag accelerometer.
 		}
 	}
 
+	// TODO: function that takes in gyroscope information
+	function gyroscopeHandler(data)
+	{
+		var values = sensortag.getGyroscopeValues(data)
+		var dx = values.x
+		var dy = values.y
+		var dz = values.z
+
+		//logGyroscopeData(dx, dy, dz)
+		//interpretGyroscopeData(dx, dy, dz)
+	}
+
+	function logGyroscopeData(dx, dy, dz)
+	{
+		console.log("x direction " + dx)
+		console.log("y direction " + dy)
+		console.log("z direction " + dz)
+	}
+
+	function interpretGyroscopeData(dx, dy, dz)
+	{
+		var x_threshold = 20
+		var y_threshold = 20
+		var z_threshold = 20
+
+		// find absolute value for magnitude comparison against safety threshold
+		magnitude_x = Math.abs(dx)
+		magnitude_y = Math.abs(dy)
+		magnitude_z = Math.abs(dz)
+
+		// compare against safety threshold
+		if (magnitude_x > x_threshold) {
+			console.log("X gyroscope rotation exceeding threshold.")
+		}
+		if (magnitude_y > y_threshold) {
+			console.log("Y acceleration exceeding threshold.")
+		}
+		if (magnitude_z > z_threshold) {
+			console.log("Z acceleration exceed threshold.")
+		}
+	}
+
 	function accelerometerHandler(data)
 	{
 		var values = sensortag.getAccelerometerValues(data)
@@ -193,45 +237,44 @@ Demonstration of the TI SensorTag accelerometer.
 		dy = Math.round(dy * 100) / 100
 		dz = Math.round(dz * 100) / 100
 
-		// interpretAccelerometerData (dx, dy, dz)
+		interpretAccelerometerData (dx, dy, dz)
 		logAccelerometerData(dx, dy, dz)
 	}
 
 	function interpretAccelerometerData(dx, dy, dz)
 	{
-		// define magnitude of safety threshold
-		var x_threshold = 0
-		var y_threshold = 0
-		var z_threshold = 0
+		var x_threshold = 2
+		var y_threshold = 1.4
 
 		// find absolute value for magnitude comparison against safety threshold
 		magnitude_x = Math.abs(dx)
 		magnitude_y = Math.abs(dy)
-		magnitude_z = Math.abs(dz)
 
-		// compare against safety threshold
+		// TODO: put this on app instead of console.log
 		if (magnitude_x > x_threshold) {
-			console.log("You may be leaning too far forward")
+			console.log("X acceleration exceeding threshold.")
 		}
 		if (magnitude_y > y_threshold) {
-			console.log("You may be leaning too far forward")
-		}
-		if (magnitude_z > z_threshold) {
-			console.log("You may be leaning too far forward")
+			console.log("Y acceleration exceeding threshold.")
 		}
 
 	}
 
 	function logAccelerometerData(dx, dy, dz)
 	{
-		// log this to some database
+		// TODO: log this to some database
 		// we should initialize a local db every time you start a workout
+		// one that is re-created every time, for the sake of simplicity....
 		// import sql.js, and log as necessary into local db file
 
-		//console.log("x is " + dx)
-		//console.log("y is " + dy)
-		console.log("z is " + dz)
+		var d = new Date()
+		var m = d.getMinutes()
+		var s = d.getSeconds()
 
+
+		console.log(m + ":" + s + "x is " + dx)
+		//console.log(m + ":" + s + "y is " + dy)
+		//console.log( m + ":" + s + " z is " + dz)
 
 	}
 
