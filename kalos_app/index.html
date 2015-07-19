@@ -94,6 +94,14 @@ Demonstration of the TI SensorTag accelerometer.
 	// Globals.
 	var sprite
 	var sensortag
+	var total1 = 0
+	var total2 = 0
+	var total3 = 0
+	var FORM_ERROR  = {
+    	TILTEDLEFT      : 'nigguh use your left side more',
+    	TILTEDRIGHT     : 'nigguh use your right side more',
+    	LEANINGFORWARD  : 'drive from the heels son'
+	}
 
 	function initialise()
 	{
@@ -164,7 +172,7 @@ Demonstration of the TI SensorTag accelerometer.
 
 	function stopDataCollect()
 	{
-
+		// call formCheck
 	}
 
 	function statusHandler(status)
@@ -215,6 +223,25 @@ Demonstration of the TI SensorTag accelerometer.
 	// 	}
 
 	// 	return repCount
+	// }
+
+	// function pressureSum(p1, p2, p3)
+	// {
+	// 	total1 += p1
+	// 	total2 += p2
+	// 	total3 += p3
+	// }
+
+
+	// function formCheck(p1, p2, p3)
+	// {
+	// 	// statements checking form based on distribution of pressure
+	// 	if(p2 > p3) // need tolerance
+	// 		return FORM_ERROR.TILTEDLEFT
+	// 	if(p3 > p2) // need tolerance
+	// 		return FORM_ERROR.TILTEDRIGHT
+	// 	if(p1 > p2 + p3) // placeholder
+	// 		return FORM_ERROR.LEANINGFORWARD
 	// }
 
 	function displayStatus(status)
