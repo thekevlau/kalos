@@ -71,6 +71,16 @@ Demonstration of the TI SensorTag accelerometer.
 		Disconnect
 	</button>
 
+	<button onclick="dataCollect()" class="green">
+		Start Workout
+		<!-- Button should start to collect data -->
+	</button>
+
+	<button onclick="stopDataCollect()" class="charcoal">
+		End Workout
+		<!-- Button should stop collecting data -->
+	</button>
+
 	<p><strong>Status:</strong> <span id="status">Ready</span></p>
 
 	<img id="sprite" src="sprite.svg" />
@@ -128,10 +138,6 @@ Demonstration of the TI SensorTag accelerometer.
 		sensortag = evothings.tisensortag.createInstance(
 			evothings.tisensortag.CC2650_BLUETOOTH_SMART)
 
-		// Uncomment to use SensorTag CC2541.
-		//sensortag = evothings.tisensortag.createInstance(
-		//	evothings.tisensortag.CC2541_BLUETOOTH_SMART)
-
 		// Set up callbacks and sensors.
 		sensortag
 			.statusCallback(statusHandler)
@@ -149,6 +155,16 @@ Demonstration of the TI SensorTag accelerometer.
 		sensortag.disconnectDevice()
 		displayStatus('Disconnected')
 		sprite.hide()
+	}
+
+	function dataCollect()
+	{
+
+	}
+
+	function stopDataCollect()
+	{
+
 	}
 
 	function statusHandler(status)
@@ -179,8 +195,27 @@ Demonstration of the TI SensorTag accelerometer.
 		var values = sensortag.getAccelerometerValues(data)
 		var dx = values.x * 50
 		var dy = values.y * 50 * -1
+		var dz = values.z //Get the z-values from the accelerometer. Use z values for Rep counter. 
+		// console.log(dx)
 		moveSprite(dx, dy)
 	}
+
+// Function for Rep Counter 
+
+	// function repCounter(dz)
+	// {
+	// 	var repCount = 0
+	// 	if (dz == 0)
+	// 	{
+	// 		repCount++ 
+	// 	}
+	// 	else 
+	// 	{
+	// 		repCount
+	// 	}
+
+	// 	return repCount
+	// }
 
 	function displayStatus(status)
 	{
