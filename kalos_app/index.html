@@ -64,21 +64,11 @@ Demonstration of the TI SensorTag accelerometer.
 	</p>
 
 	<button onclick="connect()" class="green">
-		Connect
+		Start Workout
 	</button>
 
 	<button onclick="disconnect()" class="charcoal">
-		Disconnect
-	</button>
-
-	<button onclick="dataCollect()" class="green">
-		Start Workout
-		<!-- Button should start to collect data -->
-	</button>
-
-	<button onclick="stopDataCollect()" class="charcoal">
 		End Workout
-		<!-- Button should stop collecting data -->
 	</button>
 
 	<p><strong>Status:</strong> <span id="status">Ready</span></p>
@@ -89,22 +79,31 @@ Demonstration of the TI SensorTag accelerometer.
 	<script src="libs/evothings/evothings.js"></script>
 	<script src="libs/evothings/tisensortag/tisensortag.js"></script>
 	<script src="SpriteManager.js"></script>
+	<script src="libs/util/sql.js"></script>
 
 	<script>
 	// Globals.
 	var sprite
 	var sensortag
+	var repcount_db
 
 	function initialise()
 	{
 		initialiseSprite()
 		initialiseSensorTag()
+		initialiseRepCountDatabase()
 	}
 
 	function initialiseSprite()
 	{
 		sprite = SpriteManager.makeSprite()
 		sprite.setDOMElement(document.getElementById('sprite'))
+	}
+
+	function initialiseRepCountDatabase()
+	{
+		var sql = window.SQL
+		var repcount_db = new sql.Database()
 	}
 
 	function displaySprite()
@@ -139,6 +138,7 @@ Demonstration of the TI SensorTag accelerometer.
 			evothings.tisensortag.CC2650_BLUETOOTH_SMART)
 
 		// Set up callbacks and sensors.
+		// note that the sensing interval is currently 100ms on the accelerometer data
 		sensortag
 			.statusCallback(statusHandler)
 			.errorCallback(errorHandler)
@@ -155,16 +155,6 @@ Demonstration of the TI SensorTag accelerometer.
 		sensortag.disconnectDevice()
 		displayStatus('Disconnected')
 		sprite.hide()
-	}
-
-	function dataCollect()
-	{
-
-	}
-
-	function stopDataCollect()
-	{
-
 	}
 
 	function statusHandler(status)
@@ -195,21 +185,67 @@ Demonstration of the TI SensorTag accelerometer.
 		var values = sensortag.getAccelerometerValues(data)
 		var dx = values.x * 50
 		var dy = values.y * 50 * -1
-		var dz = values.z //Get the z-values from the accelerometer. Use z values for Rep counter. 
+		var dz = values.z * 50 //Get the z-values from the accelerometer. Use z values for Rep counter.
 		// console.log(dx)
-		moveSprite(dx, dy)
+
+		// two decimal places for testing
+		dx = Math.round(dx * 100) / 100
+		dy = Math.round(dy * 100) / 100
+		dz = Math.round(dz * 100) / 100
+
+		// interpretAccelerometerData (dx, dy, dz)
+		logAccelerometerData(dx, dy, dz)
 	}
 
-// Function for Rep Counter 
+	function interpretAccelerometerData(dx, dy, dz)
+	{
+		// define magnitude of safety threshold
+		var x_threshold = 0
+		var y_threshold = 0
+		var z_threshold = 0
+
+		// find absolute value for magnitude comparison against safety threshold
+		magnitude_x = Math.abs(dx)
+		magnitude_y = Math.abs(dy)
+		magnitude_z = Math.abs(dz)
+
+		// compare against safety threshold
+		if (magnitude_x > x_threshold) {
+			console.log("You may be leaning too far forward")
+		}
+		if (magnitude_y > y_threshold) {
+			console.log("You may be leaning too far forward")
+		}
+		if (magnitude_z > z_threshold) {
+			console.log("You may be leaning too far forward")
+		}
+
+	}
+
+	function logAccelerometerData(dx, dy, dz)
+	{
+		// log this to some database
+		// we should initialize a local db every time you start a workout
+		// import sql.js, and log as necessary into local db file
+
+		//console.log("x is " + dx)
+		//console.log("y is " + dy)
+		console.log("z is " + dz)
+
+
+	}
+
+
+// Function for Rep Counter
 
 	// function repCounter(dz)
 	// {
 	// 	var repCount = 0
 	// 	if (dz == 0)
 	// 	{
-	// 		repCount++ 
+	// 		repCount++
 	// 	}
-	// 	else 
+	// 	else
 	// 	{
 	// 		repCount
 	// 	}
