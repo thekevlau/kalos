@@ -14,17 +14,6 @@ Demonstration of the TI SensorTag accelerometer.
 
 	<style>
 	@import 'ui/css/evothings-app.css';
-
-	#sprite
-	{
-		position: absolute;
-		width: 300px;
-		height: auto;
-		top: 0px;
-		left: 0px;
-		z-index: 1000;
-		display: none;
-	}
 	</style>
 
 	<script>
@@ -80,19 +69,14 @@ Demonstration of the TI SensorTag accelerometer.
 
 	<p><strong>Status:</strong> <span id="status">Ready</span></p>
 
-	<img id="sprite">
-
 	<script src="cordova.js"></script>
 	<script src="libs/evothings/evothings.js"></script>
 	<script src="libs/evothings/tisensortag/tisensortag.js"></script>
-	<script src="SpriteManager.js"></script>
 	<script src="libs/util/sql.js"></script>
 	<script src="libs/jquery/jquery.js"></script>
 
 	<script>
 	// Globals.
-	var sprite
-	var sensortag
 	var repcount_db
 	var repCount = 0
 	var flagone = false
@@ -100,16 +84,10 @@ Demonstration of the TI SensorTag accelerometer.
 
 	function initialise()
 	{
-		initialiseSprite()
 		initialiseSensorTag()
 		initialiseRepCountDatabase()
 	}
 
-	function initialiseSprite()
-	{
-		sprite = SpriteManager.makeSprite()
-		sprite.setDOMElement(document.getElementById('sprite'))
-	}
 
 	// TODO: make sure the db instance works
 	function initialiseRepCountDatabase()
@@ -118,30 +96,6 @@ Demonstration of the TI SensorTag accelerometer.
 		var repcount_db = new sql.Database()
 	}
 
-	function displaySprite()
-	{
-		sprite.whenLoaded(function()
-		{
-			sprite.show()
-			sprite.setCenterX(SpriteManager.getPlayfieldWidth() / 2)
-			sprite.setCenterY(SpriteManager.getPlayfieldHeight() / 2)
-		})
-	}
-
-	function moveSprite(dx, dy)
-	{
-		var x = sprite.getCenterX() + dx
-		var y = sprite.getCenterY() - dy
-
-		x = Math.min(x, SpriteManager.getPlayfieldWidth())
-		x = Math.max(x, 0)
-
-		y = Math.min(y, SpriteManager.getPlayfieldHeight())
-		y = Math.max(y, 0)
-
-		sprite.setCenterX(x)
-		sprite.setCenterY(y)
-	}
 
 	function initialiseSensorTag()
 	{
@@ -167,7 +121,6 @@ Demonstration of the TI SensorTag accelerometer.
 	{
 		sensortag.disconnectDevice()
 		displayStatus('Disconnected')
-		sprite.hide()
 		repCount = 0
 	}
 
@@ -179,7 +132,6 @@ Demonstration of the TI SensorTag accelerometer.
 		{
 			status = "Work Out!"
 			displayStatus(status)
-			displaySprite()
 		}
 	}
 
@@ -188,7 +140,6 @@ Demonstration of the TI SensorTag accelerometer.
 		if (evothings.easyble.error.DISCONNECTED == error)
 		{
 			displayStatus('Disconnected')
-			sprite.hide()
 		}
 		else
 		{
