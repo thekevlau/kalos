@@ -41,7 +41,7 @@ Demonstration of the TI SensorTag accelerometer.
 			<img src="ui/images/arrow-left.svg" />
 		</button>
 
-		<img class="logotype" src="ui/images/logo.svg" alt="Evothings" />
+		<img class="logotype" src="ui/images/kalos_image.jpg" alt="Evothings" />
 
 		<!--<button class="menu" onclick=""><img src="ui/images/menu.svg" /></button>-->
 	</header>
@@ -49,7 +49,7 @@ Demonstration of the TI SensorTag accelerometer.
 	<h1>Kalos</h1>
 	<h2>The Next Generation IOT Fitness Companion</h2>
 
-	<img src="weightLift.jpg"
+	<img src="ui/images/kalos_image.jpg"
 		style="float:right;width:120px;height:auto;"/>
 
 	<p>
@@ -63,6 +63,11 @@ Demonstration of the TI SensorTag accelerometer.
 		<span class="color_softred">Please upgrade the firmware of your SensorTag.</span>
 	</p>
 
+	<p><strong>Form Status :</strong></p>
+	<div id="form_status">
+		Your form is looking good!
+	</div>
+
 	<button onclick="startWorkout()" class="green">
 		Start Workout
 	</button>
@@ -75,7 +80,7 @@ Demonstration of the TI SensorTag accelerometer.
 
 	<p><strong>Status:</strong> <span id="status">Ready</span></p>
 
-	<img id="sprite" src="sprite.svg" />
+	<img id="sprite">
 
 	<script src="cordova.js"></script>
 	<script src="libs/evothings/evothings.js"></script>
@@ -90,6 +95,8 @@ Demonstration of the TI SensorTag accelerometer.
 	var sensortag
 	var repcount_db
 	var repCount = 0
+	var flagone = false
+	var flagtwo = false
 
 	function initialise()
 	{
@@ -260,10 +267,18 @@ Demonstration of the TI SensorTag accelerometer.
 
 		// TODO: put this on app instead of console.log
 		if (magnitude_x > x_threshold) {
+			document.getElementById('form_status').innerHTML = "You are leaning too far forwards/backwards."
+
 			console.log("X acceleration exceeding threshold.")
 		}
-		if (magnitude_y > y_threshold) {
+		else if (magnitude_y > y_threshold) {
+			document.getElementById('form_status').innerHTML = "You are leaning too far to the left/right."
+
 			console.log("Y acceleration exceeding threshold.")
+		}
+		else {
+			document.getElementById('form_status').innerHTML = "Your form is looking good!"
+
 		}
 
 	}
@@ -286,19 +301,30 @@ Demonstration of the TI SensorTag accelerometer.
 
 	}
 
-
-// Function for Rep Counter 
+// Function for Rep Counter
 // Need to find out for what z-values I count a rep
 
+// Rep Counter Function
 	function repCounter(dz)
 	{
-
-		if (dz < 0)
+		console.log(dz)
+		if (dz < -13)
 		{
-			repCount++ 
-			displayRepCount(repCount)
+			flagone = true
 		}
-		
+
+		if (dz > -13 && flagone)
+		{
+			flagtwo = true
+		}
+
+		if (flagone && flagtwo)
+		{
+			repCount++
+			displayRepCount(repCount)
+			flagone = false
+			flagtwo = false
+		}
 	}
 
 	function displayRepCount(Count)
